@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Z-PAY — Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="checkout" id="checkoutRoot">
+    <div class="modal-card">
+      <div id="checkoutLogo" class="checkout-logo" hidden></div>
+      <h2 id="checkoutTitle">Checkout Z-PAY</h2>
+      <p id="checkoutDesc">Carregando...</p>
+      <div class="card-value" id="checkoutAmount">R$ 0,00</div>
+      <div class="pix-parcelado" id="pixParcelado" hidden>
+        <label>PIX parcelado:</label>
+        <select id="parcelas">
+          <option value="1">À vista</option>
+          <option value="3">3x</option>
+          <option value="6">6x</option>
+          <option value="12">12x</option>
+        </select>
+        <span id="parcelaValor"></span>
+      </div>
+      <button class="primary" id="payPix">Pagar via PIX</button>
+      <button class="ghost" id="payCard">Pagar via Cartão</button>
+      <button class="ghost" id="payBoleto">Pagar via Boleto</button>
+      <button class="ghost" id="payCrypto">Pagar via Cripto</button>
+      <div class="success" id="checkoutStatus"></div>
+    </div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const chargeId = params.get('charge');
+    const amountParam = params.get('amount');
+    const descParam = params.get('desc');
+    const apiBase = (localStorage.getItem('zpay_api_base') || 'http://95.111.247.134:8082/api');
+    const wl = JSON.parse(localStorage.getItem('zpay_whitelabel') || '{}');
+    if (wl.logo) {
+      const logo = document.getElementById('checkoutLogo');
+      if (logo) { logo.innerHTML = '<img src="' + wl.logo + '" alt="Logo" />'; logo.hidden = false; }
+    }
+    if (wl.color) {
+      document.documentElement.style.setProperty('--primary', wl.color);
+      const s = document.createElement('style');
+      s.textContent = 'button.primary{background:' + wl.color + ' !important;} .checkout-logo img{max-height:48px;}';
+      document.head.appendChild(s);
+    }
+    const formatMoney = (value) => (Number(value || 0) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const status = document.getElementById('checkoutStatus');
+    let currentAmount = 0;
+    const loadCharge = async () => {
+      if (chargeId) {
+        const res = await fetch(`${apiBase}/public/charges/${chargeId}`);
+        const data = await res.json();
+        currentAmount = data.amount || 0;
+        document.getElementById('checkoutDesc').textContent = data.description || 'Pagamento';
+        document.getElementById('checkoutAmount').textContent = formatMoney(currentAmount);
+      } else if (amountParam) {
+        currentAmount = Number(amountParam);
+        document.getElementById('checkoutDesc').textContent = descParam ? decodeURIComponent(descParam) : 'Pagamento';
+        document.getElementById('checkoutAmount').textContent = formatMoney(currentAmount);
+        document.getElementById('pixParcelado').hidden = false;
+        document.getElementById('parcelas').onchange = updateParcela;
+        updateParcela();
+      }
+    };
+    const updateParcela = () => {
+      const n = Number(document.getElementById('parcelas').value);
+      const val = currentAmount / 100;
+      const parcela = n > 1 ? (val * 1.02 / n) : val;
+      document.getElementById('parcelaValor').textContent = n > 1 ? `${n}x de ${formatMoney(parcela * 100)}` : '';
+    };
+    const pay = async (method) => {
+      status.textContent = 'Processando pagamento...';
+      let cId = chargeId;
+      if (!cId && currentAmount && amountParam) {
+        const token = localStorage.getItem('zpay_token');
+        if (token) {
+          try {
+            const cr = await fetch(`${apiBase}/charges`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify({ amount: currentAmount, description: descParam || 'Pagamento', currency: 'BRL' })
+            });
+            const cd = await cr.json();
+            cId = cd.id;
+          } catch (_) {}
+        }
+      }
+      if (cId) {
+        const res = await fetch(`${apiBase}/public/charges/${cId}/pay`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ method })
+        });
+        const data = await res.json();
+        status.textContent = `Status: ${data.status}`;
+      } else {
+        status.textContent = 'Faça login no Z-PAY para criar cobranças. Ou use um link de cobrança.';
+      }
+    };
+    document.getElementById('payPix').onclick = () => pay('PIX');
+    document.getElementById('payCard').onclick = () => pay('CARD');
+    document.getElementById('payBoleto').onclick = () => pay('BOLETO');
+    document.getElementById('payCrypto').onclick = () => pay('CRYPTO');
+    loadCharge();
+  </script>
+</body>
+</html>
