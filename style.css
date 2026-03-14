@@ -2709,3 +2709,86 @@ button.danger {
   #premiumDashboard { padding: 10px 12px !important; gap: 10px !important; }
 }
 
+
+/* ════════════════════════════════════
+   SIDEBAR FIX + LOGO + MENU VISIBILITY
+════════════════════════════════════ */
+
+/* Sidebar - fundo menos opaco para menu ser visível */
+.sidebar {
+  background: #0d0f1a !important;
+}
+@media (max-width: 768px) {
+  .sidebar {
+    background: #0c0e19 !important;
+  }
+}
+
+/* Menu items - texto claramente visível */
+.menu-item {
+  color: #8b95a8 !important;
+  font-size: 14px !important;
+  padding: 12px 16px !important;
+}
+.menu-item:hover {
+  color: #e2e8f0 !important;
+  background: rgba(255,255,255,.06) !important;
+}
+.menu-item.active {
+  color: var(--ember) !important;
+  background: rgba(255,122,24,.12) !important;
+  box-shadow: inset 3px 0 0 var(--ember) !important;
+}
+
+/* Brand logo image */
+.brand-logo-img {
+  width: 36px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Login logo */
+.login-logo-wrap {
+  width: 80px;
+  height: 52px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,122,24,.08);
+  border: 1px solid rgba(255,122,24,.2);
+  border-radius: 16px;
+  padding: 8px 12px;
+  box-shadow: 0 0 32px rgba(255,122,24,.15);
+}
+.login-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ZION - remove label, adjust position */
+.zion-fab-label { display: none !important; }
+.zion-img-wrap  { margin-bottom: 0 !important; }
+
+/* Sidebar label area */
+.sidebar-lang-label,
+.sidebar-lang { color: #59627a !important; }
+.lang-code { color: #8b95a8 !important; }
+.lang-option-flag { color: #8b95a8 !important; }
+.lang-option-flag.active { color: var(--ember) !important; }
+
+/* Brand name visible */
+.brand-name { color: #f0f2f7 !important; }
+.brand-sub  { color: #59627a !important; }
+
+/* Sidebar footer badges */
+.sidebar-footer .pill {
+  background: rgba(255,255,255,.05) !important;
+  color: #8b95a8 !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+}
+#planBadge { background: rgba(255,122,24,.12) !important; color: var(--ember) !important; border-color: rgba(255,122,24,.2) !important; }
+#kycBadge  { background: rgba(52,211,153,.1)  !important; color: #34d399 !important; border-color: rgba(52,211,153,.2)  !important; }
+
