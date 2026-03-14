@@ -85,6 +85,11 @@
         <button class="menu-item" data-view="settings" data-i18n="menu_settings">Configurações</button>
         <button class="menu-item" data-view="contador">Painel Contador</button>
         <button class="menu-item" data-view="chargebacks">Chargebacks</button>
+        <button class="menu-item" data-view="checkout-adaptativo">Checkout IA</button>
+        <button class="menu-item" data-view="pagamento-preditivo">Predição</button>
+        <button class="menu-item" data-view="sistema-nervoso">Sistema Nervoso</button>
+        <button class="menu-item" data-view="nota-fiscal">Nota Fiscal</button>
+        <button class="menu-item" data-view="agentic">Agentic Commerce</button>
       </nav>
       <div class="sidebar-footer">
         <div class="pill" id="planBadge">Plano -</div>
@@ -117,149 +122,212 @@
         <button class="btn-mob-action btn-mob-danger" id="mobLogout">Sair</button>
       </div>
 
-      <section class="panel tutorial-panel" id="tutorialPanel">
-        <div class="panel-header">
-          <h2 data-i18n="tutorial_title">Guia rápido para a demo</h2>
-        </div>
-        <div class="tutorial-steps">
-          <div class="tutorial-step"><strong>1.</strong> <span data-i18n="tutorial_1">Crie uma cobrança e copie o link de pagamento.</span></div>
-          <div class="tutorial-step"><strong>2.</strong> <span data-i18n="tutorial_2">Abra o checkout e simule PIX, cartão ou boleto.</span></div>
-          <div class="tutorial-step"><strong>3.</strong> <span data-i18n="tutorial_3">Acompanhe webhooks, retries e conciliação.</span></div>
-          <div class="tutorial-step"><strong>4.</strong> <span data-i18n="tutorial_4">Explore onboarding e KYC em fila.</span></div>
-        </div>
-      </section>
+      <!-- PREMIUM DASHBOARD BENTO GRID -->
+      <div id="premiumDashboard" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
 
-      <section class="cards" id="summaryCards">
-        <div class="card">
-          <div class="card-title" data-i18n="card_volume">Volume total</div>
-          <div class="card-value" id="volumeTotal">R$ 0,00</div>
-          <div class="card-sub" id="volumeTrend">+0% vs 30d</div>
-        </div>
-        <div class="card">
-          <div class="card-title" data-i18n="card_revenue">Receita do merchant</div>
-          <div class="card-value" id="merchantRevenue">R$ 0,00</div>
-          <div class="card-sub" id="revenueTrend">+0% vs 30d</div>
-        </div>
-        <div class="card">
-          <div class="card-title" data-i18n="card_fees">Fees cobradas</div>
-          <div class="card-value" id="feesTotal">R$ 0,00</div>
-          <div class="card-sub" id="feesTrend" data-i18n="stable">Estável</div>
-        </div>
-        <div class="card">
-          <div class="card-title" data-i18n="card_balance">Saldo disponível</div>
-          <div class="card-value" id="balance">R$ 0,00</div>
-          <div class="card-sub" id="balanceTrend" data-i18n="updated_now">Atualizado agora</div>
-        </div>
-        <div class="card card-zfinance">
-          <div class="card-title" data-i18n="card_zfinance">Z-Finance</div>
-          <div class="card-value card-link" data-i18n="card_zfinance_link">Conta integrada</div>
-          <a href="#" id="zfinanceCardLink" target="_blank" rel="noopener" class="card-sub" data-i18n="open_account">Abrir conta →</a>
-        </div>
-      </section>
-
-      <section class="panel" id="dashboardView">
-        <div class="panel-header">
-          <h2 data-i18n="recent_tx">Transações recentes</h2>
-          <button class="ghost" id="refreshDashboard" data-i18n="refresh">Atualizar</button>
-        </div>
-        <div class="table table-recent" id="recentPayments"></div>
-      </section>
-
-      <section class="panel chart-panel" id="seasonalityPanel">
-        <div class="panel-header">
-          <h2 data-i18n="seasonality">Sazonalidade</h2>
-          <div class="chip-row">
-            <span class="chip" data-i18n="period_7d">7d</span>
-            <span class="chip active" data-i18n="period_30d">30d</span>
-            <span class="chip" data-i18n="period_90d">90d</span>
+        <!-- ROW 1: KPI Cards com sparklines -->
+        <div class="db-kpi-row" id="dbKpiRow">
+          <div class="db-kpi-card" id="kpiVolume">
+            <div class="db-kpi-label">VOLUME TOTAL</div>
+            <div class="db-kpi-value" id="volumeTotal">R$ 0,00</div>
+            <div class="db-kpi-delta positive" id="volumeTrend">+12% vs 30d</div>
+            <svg class="db-sparkline" id="sparkVolume" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="db-kpi-card" id="kpiRevenue">
+            <div class="db-kpi-label">RECEITA LÍQUIDA</div>
+            <div class="db-kpi-value" id="merchantRevenue">R$ 0,00</div>
+            <div class="db-kpi-delta positive" id="revenueTrend">+8% vs 30d</div>
+            <svg class="db-sparkline" id="sparkRevenue" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="db-kpi-card" id="kpiFees">
+            <div class="db-kpi-label">FEES COBRADAS</div>
+            <div class="db-kpi-value" id="feesTotal">R$ 0,00</div>
+            <div class="db-kpi-delta neutral" id="feesTrend">Estável</div>
+            <svg class="db-sparkline" id="sparkFees" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="db-kpi-card" id="kpiBalance">
+            <div class="db-kpi-label">SALDO DISPONÍVEL</div>
+            <div class="db-kpi-value" id="balance">R$ 0,00</div>
+            <div class="db-kpi-delta positive" id="balanceTrend">Atualizado agora</div>
+            <svg class="db-sparkline" id="sparkBalance" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
           </div>
         </div>
-        <div class="seasonality-chart" id="seasonalityChart"></div>
-      </section>
 
-      <section class="panel premium-panel" id="advancedPanel">
-        <div class="panel-header">
-          <h2 data-i18n="insights">Insights avançados</h2>
-          <div class="chip-row" id="insightsChips">
-            <span class="chip active" data-tab="risco" data-i18n="risk">Risco</span>
-            <span class="chip" data-tab="conversao" data-i18n="conversion">Conversão</span>
-            <span class="chip" data-tab="performance" data-i18n="performance">Performance</span>
-          </div>
-        </div>
-        <div id="insightsRisco" class="insights-tab">
-          <div class="advanced-grid">
-            <div class="advanced-card">
-              <div class="card-title" data-i18n="risk_score">Score de risco</div>
-              <div class="card-value" id="riskScore">0.0</div>
-              <div class="card-sub" id="riskDetail" data-i18n="normal">Normal</div>
+        <!-- ROW 2: Gráfico de área + Métodos + Cripto -->
+        <div class="db-row-2">
+
+          <!-- Gráfico de área principal -->
+          <div class="db-card db-area-card">
+            <div class="db-card-header">
+              <div>
+                <div class="db-card-title">Faturamento por Método</div>
+                <div class="db-card-subtitle" id="dbAreaSubtitle">Últimos 30 dias</div>
+              </div>
+              <div class="db-chip-row">
+                <span class="db-chip active" data-period="30">30d</span>
+                <span class="db-chip" data-period="7">7d</span>
+                <span class="db-chip" data-period="90">90d</span>
+              </div>
             </div>
-            <div class="advanced-card">
-              <div class="card-title" data-i18n="approval_rate">Taxa de aprovação</div>
-              <div class="card-value" id="approvalRate">0%</div>
-              <div class="card-sub" id="approvalDetail" data-i18n="last_30d">Últimos 30 dias</div>
-            </div>
-            <div class="advanced-card">
-              <div class="card-title" data-i18n="avg_ticket">Ticket médio</div>
-              <div class="card-value" id="avgTicket">R$ 0,00</div>
-              <div class="card-sub" id="avgDetail" data-i18n="avg_per_payment">Média por pagamento</div>
+            <div class="db-area-wrap">
+              <svg id="dbAreaChart" class="db-area-svg" viewBox="0 0 600 180" preserveAspectRatio="none"></svg>
+              <div class="db-area-legend" id="dbAreaLegend"></div>
             </div>
           </div>
-        </div>
-        <div id="insightsConversao" class="insights-tab" hidden>
-          <div class="conversion-panel">
-            <div>
-              <div class="card-title" data-i18n="auto_convert_title">Conversão automática de recebíveis</div>
-              <p data-i18n="auto_convert_desc">Simule a conversão do volume para a moeda desejada. Suporta fiat e cripto.</p>
+
+          <!-- Métodos + Risco -->
+          <div class="db-col-right">
+            <!-- Distribuição métodos -->
+            <div class="db-card db-methods-card">
+              <div class="db-card-header">
+                <div class="db-card-title">Distribuição</div>
+                <span class="db-badge-ok">● Live</span>
+              </div>
+              <div id="dbMethodsChart"></div>
             </div>
-            <div class="conversion-controls">
-              <label class="compact">
-                <span class="label-row" data-i18n="currency">Moeda</span>
-                <select id="settlementCurrency">
-                  <optgroup label="Fiat">
-                    <option value="BRL">BRL</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                  </optgroup>
-                  <optgroup label="Cripto">
-                    <option value="USDT">USDT</option>
-                    <option value="BTC">BTC</option>
-                    <option value="ETH">ETH</option>
-                  </optgroup>
+            <!-- Risco / KPIs rápidos -->
+            <div class="db-card db-risk-card">
+              <div class="db-card-header">
+                <div class="db-card-title">Score de Risco</div>
+                <div class="db-risk-score" id="dbRiskScore">10</div>
+              </div>
+              <div class="db-risk-bar-wrap">
+                <div class="db-risk-bar" id="dbRiskBar"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Aprovação</div>
+                  <div class="db-mini-val green" id="approvalRate">100%</div>
+                </div>
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Ticket Médio</div>
+                  <div class="db-mini-val" id="avgTicket">R$ 0</div>
+                </div>
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Chargebacks</div>
+                  <div class="db-mini-val green">0,00%</div>
+                </div>
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Uptime</div>
+                  <div class="db-mini-val green">99,98%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: Transações recentes + Sazonalidade + Cripto -->
+        <div class="db-row-3">
+
+          <!-- Transações recentes premium -->
+          <div class="db-card db-txn-card">
+            <div class="db-card-header">
+              <div class="db-card-title">Transações Recentes</div>
+              <button class="ghost db-refresh-btn" id="refreshDashboard">↻ Atualizar</button>
+            </div>
+            <div id="recentPayments" class="db-txn-list"></div>
+          </div>
+
+          <!-- Sazonalidade premium -->
+          <div class="db-card db-season-card">
+            <div class="db-card-header">
+              <div class="db-card-title">Sazonalidade</div>
+              <div class="db-chip-row">
+                <span class="db-chip active">30d</span>
+              </div>
+            </div>
+            <div class="db-season-wrap" id="seasonalityChart"></div>
+          </div>
+
+          <!-- Cripto balance -->
+          <div class="db-card db-crypto-card">
+            <div class="db-card-header">
+              <div class="db-card-title">Saldo Cripto</div>
+              <a href="#" id="zfinanceCardLink" class="db-zfinance-link">Z-Finance →</a>
+            </div>
+            <div id="dbCryptoBalances"></div>
+            <div class="db-crypto-cta">
+              <div class="db-card-title" style="margin-top:14px">Conversão Automática</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+                <select id="settlementCurrency" class="db-select">
+                  <option value="BRL">BRL</option>
+                  <option value="USDT">USDT</option>
+                  <option value="BTC">BTC</option>
+                  <option value="ETH">ETH</option>
                 </select>
-              </label>
-              <label class="switch">
-                <input type="checkbox" id="autoConvert" />
-                <span class="slider"></span>
-              </label>
-              <span class="label-row" data-i18n="auto_convert">Auto converter</span>
+                <label class="switch" style="flex-shrink:0"><input type="checkbox" id="autoConvert"/><span class="slider"></span></label>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- Hidden elements needed by existing JS -->
+        <div hidden>
+          <div id="riskScore"></div>
+          <div id="riskDetail"></div>
+          <div id="approvalDetail"></div>
+          <div id="avgDetail"></div>
+          <div id="volumeTrendHidden" id="volumeTrend2"></div>
+          <div id="revenueTrend2"></div>
+          <div id="feesTrend2"></div>
+          <div id="balanceTrend2"></div>
+        </div>
+
+        <!-- Insights avançados (conversão/performance) -->
+        <div class="db-card" id="advancedPanel">
+          <div class="db-card-header">
+            <div class="db-card-title">Insights Avançados</div>
+            <div class="db-chip-row" id="insightsChips">
+              <span class="chip active" data-tab="risco">Risco</span>
+              <span class="chip" data-tab="conversao">Conversão</span>
+              <span class="chip" data-tab="performance">Performance</span>
+            </div>
+          </div>
+          <div id="insightsRisco" class="insights-tab" style="display:none"></div>
+          <div id="insightsConversao" class="insights-tab" hidden>
+            <div class="conversion-panel">
+              <div>
+                <div class="card-title">Conversão automática de recebíveis</div>
+                <p>Simule a conversão do volume para a moeda desejada.</p>
+              </div>
+              <div class="conversion-controls">
+                <label class="switch"><input type="checkbox" id="autoConvert2"/><span class="slider"></span></label>
+                <span class="label-row">Auto converter</span>
+              </div>
+        </div>
           <div class="conversion-panel" style="margin-top:12px;">
-            <div class="card-title" data-i18n="crypto_wallet_title">Receber saldo em cripto</div>
-            <p data-i18n="crypto_wallet_desc">Por padrão, cobranças em cripto são convertidas para BRL. Para receber em cripto, registre uma carteira em Configurações.</p>
-            <a href="#" class="link" data-goto="settings" data-i18n="configure_wallet">Configurar carteira →</a>
+            <div class="card-title">Receber saldo em cripto</div>
+            <p>Cobranças em cripto são convertidas para BRL por padrão.</p>
+            <a href="#" class="link" data-goto="settings">Configurar carteira →</a>
           </div>
         </div>
         <div id="insightsPerformance" class="insights-tab" hidden>
           <div class="advanced-grid">
             <div class="advanced-card">
-              <div class="card-title" data-i18n="latency">Latência média</div>
+              <div class="card-title">Latência média</div>
               <div class="card-value" id="latencyAvg">~180ms</div>
-              <div class="card-sub" data-i18n="api_response">Tempo de resposta API</div>
+              <div class="card-sub">Tempo de resposta API</div>
             </div>
             <div class="advanced-card">
-              <div class="card-title" data-i18n="uptime">Uptime 30d</div>
+              <div class="card-title">Uptime 30d</div>
               <div class="card-value" id="uptimePct">99.98%</div>
-              <div class="card-sub" data-i18n="availability">Disponibilidade</div>
+              <div class="card-sub">Disponibilidade</div>
             </div>
             <div class="advanced-card">
-              <div class="card-title" data-i18n="tx_per_hour">Transações/hora</div>
+              <div class="card-title">Transações/hora</div>
               <div class="card-value" id="txPerHour">—</div>
-              <div class="card-sub" data-i18n="peak_24h">Pico nas últimas 24h</div>
+              <div class="card-sub">Pico nas últimas 24h</div>
             </div>
           </div>
         </div>
-      </section>
+        </div><!-- end advancedPanel -->
+      </div><!-- end premiumDashboard -->
+
+      <!-- Legacy hidden sections for setView compatibility -->
+      <section id="dashboardView"  hidden style="display:none!important"></section>
+      <section id="seasonalityPanel" hidden style="display:none!important"></section>
+      <section id="summaryCards"   hidden style="display:none!important"></section>
+      <section id="tutorialPanel"  hidden style="display:none!important"></section>
 
       <section class="panel" id="chargesView" hidden>
         <div class="panel-header">
@@ -679,7 +747,54 @@
         </form>
       </section>
 
-      <!-- PAINEL CONTADOR -->
+      <!-- CHECKOUT ADAPTATIVO -->
+      <section class="panel" id="checkout-adaptativoView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <div>
+            <h2>Checkout Inteligente Adaptativo</h2>
+            <p style="font-size:13px;color:var(--text3);margin-top:4px">O checkout detecta o perfil do pagador e se adapta em tempo real para maximizar conversão</p>
+          </div>
+          <span class="adaptive-badge">IA ATIVA</span>
+        </div>
+        <div id="adaptiveContent"></div>
+      </section>
+
+      <!-- PAGAMENTO PREDITIVO -->
+      <section class="panel" id="pagamento-preditivoView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Pagamento Preditivo</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">ZION identifica o melhor momento para disparar cobranças recorrentes</p>
+        </div>
+        <div id="predictiveContent"></div>
+      </section>
+
+      <!-- SISTEMA NERVOSO -->
+      <section class="panel" id="sistema-nervosoView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Sistema Nervoso</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">ZION monitora seu negócio 24/7 e age proativamente sem você pedir</p>
+        </div>
+        <div id="nerveContent"></div>
+      </section>
+
+      <!-- NOTA FISCAL AUTOMÁTICA -->
+      <section class="panel" id="nota-fiscalView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Nota Fiscal Automática</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">NF emitida automaticamente a cada pagamento aprovado com otimização tributária</p>
+        </div>
+        <div id="nfContent"></div>
+      </section>
+
+      <!-- AGENTIC COMMERCE -->
+      <section class="panel" id="agenticView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Agentic Commerce</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">Seus produtos disponíveis para compra dentro de IAs como ChatGPT e Gemini</p>
+        </div>
+        <div id="agenticContent"></div>
+      </section>
+
       <section class="panel" id="contadorView" hidden>
         <div class="panel-header">
           <h2>Painel do Contador</h2>
@@ -845,28 +960,6 @@
     <button class="zion-fab" id="zionFab">
       <div class="zion-img-wrap">
         <img src="zion_zpay.png" class="zion-img" alt="ZION"/>
-        <svg class="zion-flame-anim" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="fg1" cx="50%" cy="15%" r="55%">
-              <stop offset="0%" stop-color="#fff8e0"/>
-              <stop offset="35%" stop-color="#ffcc44"/>
-              <stop offset="70%" stop-color="#ff7a18"/>
-              <stop offset="100%" stop-color="#ff4400" stop-opacity="0"/>
-            </radialGradient>
-            <radialGradient id="fg2" cx="50%" cy="20%" r="50%">
-              <stop offset="0%" stop-color="#ffaa30"/>
-              <stop offset="60%" stop-color="#ff6600"/>
-              <stop offset="100%" stop-color="#cc3300" stop-opacity="0"/>
-            </radialGradient>
-            <filter id="ff1" x="-80%" y="-40%" width="360%" height="280%">
-              <feGaussianBlur stdDeviation="7" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <ellipse class="fl-outer" cx="50" cy="100" rx="26" ry="38" fill="url(#fg2)" filter="url(#ff1)"/>
-          <ellipse class="fl-mid"  cx="50" cy="90"  rx="16" ry="26" fill="url(#fg1)" filter="url(#ff1)"/>
-          <ellipse class="fl-hot"  cx="50" cy="78"  rx="6"  ry="11" fill="#fff9ee" opacity="0.95"/>
-        </svg>
       </div>
       <span class="zion-fab-label">ZION</span>
     </button>

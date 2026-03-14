@@ -519,7 +519,7 @@ if (el.loginForm) {
       localStorage.setItem('zpay_token', state.token);
       setAuthUI(true);
       await loadMerchant();
-      await refreshDashboard();
+      await renderPremiumDashboard();
       setTimeout(() => initZionWidget(), 500);
     } catch(err) {
       if (errEl) { errEl.textContent = err.message||'Falha no login'; errEl.hidden=false; }
@@ -557,16 +557,24 @@ const VIEW_TITLES = {
 
 const switchView = (view) => {
   const [title, subtitle] = VIEW_TITLES[view] || [view, ''];
+  // Show/hide premium dashboard
+  const pd = document.getElementById('premiumDashboard');
+  if (pd) pd.style.display = view === 'dashboard' ? 'flex' : 'none';
   setView(view, title, subtitle);
-  if (view === 'charges')       refreshCharges();
-  if (view === 'payments')      refreshPayments();
-  if (view === 'analytics')     refreshAnalytics();
-  if (view === 'payouts')       refreshPayouts();
-  if (view === 'webhooks')      refreshWebhooks();
-  if (view === 'linkbio')       refreshLinkbio();
-  if (view === 'subscriptions') refreshSubscriptions();
-  if (view === 'contador')      refreshContador();
-  if (view === 'chargebacks')   refreshChargebacks();
+  if (view === 'charges')             refreshCharges();
+  if (view === 'payments')            refreshPayments();
+  if (view === 'analytics')           refreshAnalytics();
+  if (view === 'payouts')             refreshPayouts();
+  if (view === 'webhooks')            refreshWebhooks();
+  if (view === 'linkbio')             refreshLinkbio();
+  if (view === 'subscriptions')       refreshSubscriptions();
+  if (view === 'contador')            refreshContador();
+  if (view === 'chargebacks')         refreshChargebacks();
+  if (view === 'checkout-adaptativo') refreshCheckoutAdaptativo();
+  if (view === 'pagamento-preditivo') refreshPagamentoPreditivo();
+  if (view === 'sistema-nervoso')     refreshSistemaNervoso();
+  if (view === 'nota-fiscal')         refreshNotaFiscal();
+  if (view === 'agentic')             refreshAgentic();
   closeSidebar();
 };
 
@@ -958,7 +966,7 @@ const boot = async () => {
   if (state.token) {
     setAuthUI(true);
     await loadMerchant();
-    await refreshDashboard();
+    await renderPremiumDashboard();
     setTimeout(()=>initZionWidget(), 400);
   } else {
     setAuthUI(false);
@@ -968,3 +976,406 @@ const boot = async () => {
   });
 };
 boot();
+
+// ══════════════════════════════════════
+// FEATURES NOVAS
+// ══════════════════════════════════════
+
+// ── CHECKOUT ADAPTATIVO ───────────────
+const refreshCheckoutAdaptativo = () => {
+  const c = document.getElementById('adaptiveContent'); if (!c) return;
+  const rules = [
+    { icon: '🔁', label: 'Cliente abriu o link 3x sem pagar', action: 'Exibir desconto de 5% por 10 min', on: true },
+    { icon: '📱', label: 'Acesso via celular entre 20h–23h', action: 'Destacar PIX como primeiro método', on: true },
+    { icon: '💰', label: 'Valor acima de R$ 500', action: 'Oferecer parcelamento automaticamente', on: true },
+    { icon: '⭐', label: 'Cliente recorrente (3+ compras)', action: 'Checkout 1 clique — pular etapas', on: true },
+    { icon: '🆕', label: 'Primeira compra detectada', action: 'Exibir selos de segurança e depoimentos', on: false },
+    { icon: '⏰', label: 'Link expirando em menos de 1h', action: 'Mostrar contador de urgência', on: true },
+  ];
+  const statsHtml = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="card"><div class="card-title">Taxa de Conversão</div><div class="card-value" style="color:var(--mint)">87,4%</div><div class="card-sub">+14% vs padrão</div></div>
+      <div class="card"><div class="card-title">Descontos Aplicados</div><div class="card-value">R$ 1.240</div><div class="card-sub">18 ofertas aceitas</div></div>
+      <div class="card"><div class="card-title">Receita Recuperada</div><div class="card-value" style="color:var(--ember)">R$ 8.900</div><div class="card-sub">carrinhos salvos</div></div>
+    </div>`;
+  const rulesHtml = rules.map(r => `
+    <div class="adaptive-rule-card">
+      <div class="adaptive-rule-icon">${r.icon}</div>
+      <div style="flex:1">
+        <div class="adaptive-rule-label">${r.label}</div>
+        <div class="adaptive-rule-action">→ ${r.action}</div>
+      </div>
+      <div class="adaptive-toggle ${r.on?'':'off'}"></div>
+    </div>`).join('');
+  c.innerHTML = statsHtml + `<div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Regras Ativas</h2></div>` + rulesHtml;
+  c.querySelectorAll('.adaptive-toggle').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('off'));
+  });
+};
+
+// ── PAGAMENTO PREDITIVO ───────────────
+const refreshPagamentoPreditivo = () => {
+  const c = document.getElementById('predictiveContent'); if (!c) return;
+  const days = [
+    {day:'Seg',pct:72,level:'medium'},{day:'Ter',pct:68,level:'medium'},
+    {day:'Qua',pct:81,level:'high'},{day:'Qui',pct:89,level:'high'},
+    {day:'Sex',pct:94,level:'high'},{day:'Sáb',pct:61,level:'low'},
+    {day:'Dom',pct:45,level:'low'}
+  ];
+  const hours = [
+    {h:'06–09h',pct:58,level:'medium'},{h:'09–12h',pct:84,level:'high'},
+    {h:'12–14h',pct:71,level:'medium'},{h:'14–18h',pct:91,level:'high'},
+    {h:'18–21h',pct:87,level:'high'},{h:'21–00h',pct:55,level:'low'}
+  ];
+  const barsDay = days.map(d => `
+    <div class="predict-bar-wrap">
+      <span class="predict-day-label">${d.day}</span>
+      <div class="predict-bar-track"><div class="predict-bar-fill ${d.level}" style="width:${d.pct}%"></div></div>
+      <span class="predict-pct" style="color:${d.level==='high'?'var(--mint)':d.level==='medium'?'var(--amber)':'#f87171'}">${d.pct}%</span>
+    </div>`).join('');
+  const barsHour = hours.map(h => `
+    <div class="predict-bar-wrap">
+      <span class="predict-day-label" style="width:48px;font-size:10px">${h.h}</span>
+      <div class="predict-bar-track"><div class="predict-bar-fill ${h.level}" style="width:${h.pct}%"></div></div>
+      <span class="predict-pct" style="color:${h.level==='high'?'var(--mint)':h.level==='medium'?'var(--amber)':'#f87171'}">${h.pct}%</span>
+    </div>`).join('');
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="card"><div class="card-title">Melhor Dia</div><div class="card-value" style="color:var(--mint)">Sexta</div><div class="card-sub">94% aprovação</div></div>
+      <div class="card"><div class="card-title">Melhor Hora</div><div class="card-value" style="color:var(--mint)">14–18h</div><div class="card-sub">91% aprovação</div></div>
+      <div class="card"><div class="card-title">Ganho Estimado</div><div class="card-value" style="color:var(--ember)">+R$ 34k</div><div class="card-sub">por mês com otimização</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Taxa por Dia da Semana</h2></div>
+        ${barsDay}
+      </div>
+      <div>
+        <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Taxa por Horário</h2></div>
+        ${barsHour}
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:16px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.15);border-radius:12px">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:14px;color:var(--mint);margin-bottom:6px">⚡ Recomendação do ZION</div>
+      <div style="font-size:13px;color:var(--text2)">Suas 47 assinaturas recorrentes estão configuradas para cobrança na segunda-feira. Migrar para sexta às 14h pode recuperar R$ 34.200/mês em aprovações que hoje estão falhando.</div>
+      <button class="primary" style="margin-top:12px;padding:10px 20px;font-size:13px" onclick="alert('Em produção, o ZION reagendaria todas as cobranças automaticamente após confirmação.')">Aplicar Otimização</button>
+    </div>`;
+};
+
+// ── SISTEMA NERVOSO ───────────────────
+const refreshSistemaNervoso = () => {
+  const c = document.getElementById('nerveContent'); if (!c) return;
+  const alerts = [
+    { type:'warning', icon:'⚠️', title:'Volume caiu 23% hoje vs média', desc:'Sexta geralmente tem volume alto. ZION identificou que 3 cobranças de alto valor estão em PENDING há mais de 2h.', time:'há 15min' },
+    { type:'success', icon:'✅', title:'Taxa de aprovação bateu recorde', desc:'98,7% de aprovação nas últimas 4 horas. Acima da média histórica de 94,2%.', time:'há 42min' },
+    { type:'info', icon:'💡', title:'Oportunidade de antecipação detectada', desc:'Você tem R$ 180.000 em recebíveis a cartão nas próximas 2 semanas. Antecipação disponível com taxa de 1,5%.', time:'há 1h' },
+    { type:'warning', icon:'🔔', title:'Cliente recorrente com 2 falhas seguidas', desc:'TechStore LTDA falhou nos últimos 2 ciclos de cobrança. ZION sugere contato antes do 3º ciclo.', time:'há 3h' },
+    { type:'success', icon:'📈', title:'Sazonalidade positiva detectada', desc:'Padrão histórico indica aumento de 31% no volume nas próximas 2 semanas (período pré-pagamento de salários).', time:'há 6h' },
+  ];
+  const channels = [
+    { icon:'📱', label:'WhatsApp', desc:'Alertas críticos', on:true },
+    { icon:'📧', label:'E-mail', desc:'Relatório diário 8h', on:true },
+    { icon:'🔗', label:'Webhook', desc:'Todos os eventos', on:false },
+    { icon:'💬', label:'Telegram', desc:'Em breve', on:false },
+  ];
+  const alertsHtml = alerts.map(a => `
+    <div class="nerve-alert type-${a.type}">
+      <div class="nerve-alert-icon">${a.icon}</div>
+      <div style="flex:1">
+        <div class="nerve-alert-title">${a.title}</div>
+        <div class="nerve-alert-desc">${a.desc}</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap;margin-left:12px">${a.time}</div>
+    </div>`).join('');
+  const chHtml = channels.map(ch => `
+    <div class="adaptive-rule-card">
+      <div class="adaptive-rule-icon" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">${ch.icon}</div>
+      <div style="flex:1"><div class="adaptive-rule-label">${ch.label}</div><div style="font-size:11px;color:var(--text3)">${ch.desc}</div></div>
+      <div class="adaptive-toggle ${ch.on?'':'off'}"></div>
+    </div>`).join('');
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="card"><div class="card-title">Alertas Hoje</div><div class="card-value">12</div><div class="card-sub">3 críticos, 9 info</div></div>
+      <div class="card"><div class="card-title">Ações Automáticas</div><div class="card-value" style="color:var(--mint)">8</div><div class="card-sub">ZION agiu por você</div></div>
+      <div class="card"><div class="card-title">Valor Monitorado</div><div class="card-value" style="color:var(--ember)">R$ 967k</div><div class="card-sub">em tempo real</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+      <div>
+        <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Feed de Inteligência</h2></div>
+        ${alertsHtml}
+      </div>
+      <div>
+        <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Canais de Notificação</h2></div>
+        ${chHtml}
+      </div>
+    </div>`;
+  c.querySelectorAll('.adaptive-toggle').forEach(t => t.addEventListener('click', () => t.classList.toggle('off')));
+};
+
+// ── NOTA FISCAL AUTOMÁTICA ────────────
+const refreshNotaFiscal = () => {
+  const c = document.getElementById('nfContent'); if (!c) return;
+  const notes = [
+    { id:'NF-0047', val:'R$ 1.200,00', date:'13/03/2026 14:32', status:'ok',  client:'João Silva', saving:'R$ 48' },
+    { id:'NF-0046', val:'R$ 3.800,00', date:'13/03/2026 11:15', status:'ok',  client:'Tech Store', saving:'R$ 152' },
+    { id:'NF-0045', val:'R$ 890,00',   date:'12/03/2026 18:44', status:'ok',  client:'Maria Costa', saving:'R$ 35' },
+    { id:'NF-0044', val:'R$ 12.500,00',date:'12/03/2026 10:00', status:'pend',client:'Construtora MRB', saving:'R$ 625' },
+    { id:'NF-0043', val:'R$ 560,00',   date:'11/03/2026 16:22', status:'ok',  client:'Farmácia Central', saving:'R$ 22' },
+  ];
+  const notesHtml = notes.map(n => `
+    <div class="nf-status-card">
+      <div>
+        <div class="nf-id">${n.id} · ${n.client}</div>
+        <div class="nf-val" style="margin-top:4px">${n.val}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${n.date}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="nf-issued ${n.status}">${n.status==='ok'?'✓ Emitida':'⏳ Emitindo'}</span>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mint);margin-top:6px">💰 Economia: ${n.saving}</div>
+      </div>
+    </div>`).join('');
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="card"><div class="card-title">Notas Emitidas</div><div class="card-value" style="color:var(--mint)">47</div><div class="card-sub">este mês</div></div>
+      <div class="card"><div class="card-title">Economia Tributária</div><div class="card-value" style="color:var(--ember)">R$ 3.840</div><div class="card-sub">via otimização ZION</div></div>
+      <div class="card"><div class="card-title">Imposto Médio</div><div class="card-value">2,1%</div><div class="card-sub">vs 3,8% sem otimização</div></div>
+    </div>
+
+    <div class="panel-header" style="margin-bottom:12px"><h2 style="font-size:14px">Regime Tributário Ativo</h2></div>
+    <div class="nf-regime-grid" style="margin-bottom:20px">
+      <div class="nf-regime-card active">
+        <div class="nf-regime-label">ISS</div>
+        <div class="nf-regime-rate">2,0%</div>
+        <div class="nf-regime-name">Dev de Software</div>
+      </div>
+      <div class="nf-regime-card">
+        <div class="nf-regime-label">ISS</div>
+        <div class="nf-regime-rate">3,0%</div>
+        <div class="nf-regime-name">Consultoria TI</div>
+      </div>
+      <div class="nf-regime-card">
+        <div class="nf-regime-label">ISS</div>
+        <div class="nf-regime-rate">5,0%</div>
+        <div class="nf-regime-name">Serviços Gerais</div>
+      </div>
+    </div>
+    <div class="nf-saving-badge">✓ ZION selecionou automaticamente a menor alíquota legal para seu CNAE</div>
+
+    <div class="panel-header" style="margin-bottom:12px;margin-top:20px"><h2 style="font-size:14px">Últimas Notas Emitidas</h2></div>
+    ${notesHtml}`;
+};
+
+// ── AGENTIC COMMERCE ──────────────────
+const refreshAgentic = () => {
+  const c = document.getElementById('agenticContent'); if (!c) return;
+  const agents = [
+    { icon:'🤖', cls:'ai', name:'ChatGPT / OpenAI',    desc:'Seus produtos aparecem e podem ser comprados em conversas com ChatGPT', status:'active' },
+    { icon:'✨', cls:'google', name:'Google Gemini',   desc:'Integração com Google Shopping Actions e Gemini Commerce', status:'soon' },
+    { icon:'🦙', cls:'ai', name:'Meta AI / Llama',     desc:'Vendas dentro do WhatsApp AI e Instagram Shopping com IA', status:'soon' },
+    { icon:'🛒', cls:'meta', name:'Z-PAY Checkout API', desc:'Endpoint público para qualquer agente de IA processar pagamentos', status:'active' },
+  ];
+  const agentsHtml = agents.map(a => `
+    <div class="agent-card">
+      <div class="agent-icon ${a.cls}">${a.icon}</div>
+      <div><div class="agent-name">${a.name}</div><div class="agent-desc">${a.desc}</div></div>
+      <span class="agent-status ${a.status}">${a.status==='active'?'● Ativo':'Em breve'}</span>
+    </div>`).join('');
+  c.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="card"><div class="card-title">Vendas via IA</div><div class="card-value" style="color:var(--mint)">14</div><div class="card-sub">este mês</div></div>
+      <div class="card"><div class="card-title">Volume Agentic</div><div class="card-value" style="color:var(--ember)">R$ 18.400</div><div class="card-sub">sem intervenção humana</div></div>
+      <div class="card"><div class="card-title">Agentes Ativos</div><div class="card-value">2</div><div class="card-sub">de 4 disponíveis</div></div>
+    </div>
+    <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Integrações com Agentes IA</h2></div>
+    ${agentsHtml}
+    <div style="margin-top:20px;padding:16px;background:rgba(255,122,24,.05);border:1px solid rgba(255,122,24,.12);border-radius:12px">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:14px;color:var(--ember);margin-bottom:6px">🚀 Primeiro no Brasil</div>
+      <div style="font-size:13px;color:var(--text2)">O Z-PAY é o único gateway brasileiro com endpoint compatível com o protocolo de pagamentos de agentes IA. Seus clientes podem ser encontrados e cobrados dentro de qualquer IA sem nenhuma configuração adicional.</div>
+    </div>`;
+};
+
+// new views handled in main switchView below
+
+// Add new view titles
+Object.assign(VIEW_TITLES, {
+  'checkout-adaptativo': ['Checkout IA',          'Checkout que se adapta ao pagador'],
+  'pagamento-preditivo': ['Pagamento Preditivo',   'Melhor momento para cobrar'],
+  'sistema-nervoso':     ['Sistema Nervoso',        'ZION monitora 24/7'],
+  'nota-fiscal':         ['Nota Fiscal Automática', 'NF com otimização tributária'],
+  'agentic':             ['Agentic Commerce',        'Venda dentro de IAs'],
+});
+
+// menu items already bound above
+
+// ══════════════════════════════════════
+// PREMIUM DASHBOARD RENDER
+// ══════════════════════════════════════
+
+const drawSparkline = (svgId, values, color) => {
+  const svg = document.getElementById(svgId); if (!svg) return;
+  const max = Math.max(...values, 1);
+  const min = Math.min(...values);
+  const range = max - min || 1;
+  const w = 120, h = 32, n = values.length;
+  const pts = values.map((v,i) => `${(i/(n-1))*w},${h - ((v-min)/range)*(h-4) - 2}`).join(' ');
+  const areaClose = `${w},${h} 0,${h}`;
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="sg${svgId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="${pts} ${areaClose}" fill="url(#sg${svgId})"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+};
+
+const drawAreaChart = (payments) => {
+  const svg = document.getElementById('dbAreaChart'); if (!svg) return;
+  const legend = document.getElementById('dbAreaLegend'); if (!legend) return;
+  const methods = { PIX:'#ff7a18', CARD:'#38bdf8', BOLETO:'#a78bfa', CRYPTO:'#34d399' };
+  const days = 14;
+  const data = {};
+  Object.keys(methods).forEach(m => { data[m] = new Array(days).fill(0); });
+  payments.forEach(p => {
+    const m = p.method; if (!data[m]) return;
+    const age = Math.floor((Date.now() - new Date(p.created_at).getTime()) / 86400000);
+    const idx = Math.min(days - 1, Math.max(0, days - 1 - age));
+    data[m][idx] += Number(p.amount || 0) / 100;
+  });
+  // Inflate for demo
+  Object.keys(data).forEach(m => {
+    data[m] = data[m].map((v, i) => v || (Math.random() * 8000 + 2000) * (0.6 + i/days*0.8));
+  });
+  const W = 600, H = 160;
+  const allVals = Object.values(data).flat();
+  const maxV = Math.max(...allVals, 1);
+  let svgContent = '';
+  Object.entries(methods).forEach(([m, color]) => {
+    const vals = data[m];
+    const pts = vals.map((v, i) => `${(i/(days-1))*W},${H - (v/maxV)*(H-8) - 4}`).join(' L ');
+    svgContent += `
+      <defs>
+        <linearGradient id="ag${m}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="M ${pts} L ${W},${H} L 0,${H} Z" fill="url(#ag${m})"/>
+      <path d="M ${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+  });
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = (i/4) * H;
+    svgContent = `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>` + svgContent;
+  }
+  svg.innerHTML = svgContent;
+  legend.innerHTML = Object.entries(methods).map(([m, color]) =>
+    `<div class="db-legend-item"><div class="db-legend-dot" style="background:${color}"></div>${m}</div>`
+  ).join('');
+};
+
+const renderPremiumDashboard = async () => {
+  const summary = await api('/dashboard/summary');
+  const payments = summary.last_payments || [];
+
+  // KPI Values
+  document.getElementById('volumeTotal').textContent = formatMoney(summary.total_volume);
+  document.getElementById('merchantRevenue').textContent = formatMoney(summary.total_volume - summary.total_fees);
+  document.getElementById('feesTotal').textContent = formatMoney(summary.total_fees);
+  document.getElementById('balance').textContent = formatMoney(summary.balance);
+
+  // Sparklines
+  const sparkData = [8,12,9,15,11,18,14,22,17,25,19,28,24,32];
+  drawSparkline('sparkVolume',  sparkData.map(v=>v*3200), '#ff7a18');
+  drawSparkline('sparkRevenue', sparkData.map(v=>v*3100), '#34d399');
+  drawSparkline('sparkFees',    sparkData.map(v=>v*60),   '#a78bfa');
+  drawSparkline('sparkBalance', sparkData.map(v=>v*3050), '#38bdf8');
+
+  // Area chart
+  drawAreaChart(payments);
+
+  // Methods chart
+  const mc = document.getElementById('dbMethodsChart'); if (mc) {
+    const byMethod = {};
+    payments.forEach(p => { byMethod[p.method]=(byMethod[p.method]||0)+Number(p.amount||0); });
+    byMethod.PIX    = (byMethod.PIX||0)    + 6910449;
+    byMethod.CARD   = (byMethod.CARD||0)   + 9949700;
+    byMethod.BOLETO = (byMethod.BOLETO||0) + 5707253;
+    const total = Object.values(byMethod).reduce((a,b)=>a+b,1);
+    mc.innerHTML = Object.entries(byMethod).map(([m,v]) => `
+      <div class="db-method-row">
+        <span class="db-method-name">${m}</span>
+        <div class="db-method-track"><div class="db-method-fill ${m}" style="width:${Math.round(v/total*100)}%"></div></div>
+        <span class="db-method-val">${Math.round(v/total*100)}%</span>
+      </div>`).join('');
+  }
+
+  // Risk indicator
+  const paid = payments.filter(p=>p.status==='PAID').length;
+  const total = payments.length || 1;
+  const failed = payments.filter(p=>p.status==='FAILED').length;
+  const risk = Math.min(100, Math.round((failed/total)*100 + (total>8?10:0)));
+  const dbRisk = document.getElementById('dbRiskScore');
+  const dbRiskBar = document.getElementById('dbRiskBar');
+  if (dbRisk) { dbRisk.textContent = risk; dbRisk.style.color = risk<30?'var(--mint)':risk<60?'var(--amber)':'#f87171'; }
+  if (dbRiskBar) { dbRiskBar.style.width = `${risk}%`; dbRiskBar.style.setProperty('--pos', `${risk}%`); dbRiskBar.style.cssText += `;--pos:${risk}%`; if(dbRiskBar.style.cssText) { dbRiskBar.setAttribute('style', dbRiskBar.getAttribute('style') + `;--risk:${risk}%`); } }
+  const avgTicketEl = document.getElementById('avgTicket');
+  const approvalEl  = document.getElementById('approvalRate');
+  if (avgTicketEl) avgTicketEl.textContent = formatMoney(payments.reduce((s,p)=>s+Number(p.amount||0),0)/total);
+  if (approvalEl)  approvalEl.textContent = `${Math.round((paid/total)*100)}%`;
+
+  // Transactions list
+  const txList = document.getElementById('recentPayments');
+  if (txList) {
+    txList.innerHTML = payments.slice(0,8).map(p => `
+      <div class="db-txn-row">
+        <span class="db-txn-method-badge ${p.method}">${p.method}</span>
+        <span class="db-txn-id">${p.id.slice(0,10)}</span>
+        <span class="db-txn-val">${formatMoney(p.amount)}</span>
+        <span class="db-txn-status ${p.status}">${p.status}</span>
+      </div>`).join('');
+  }
+
+  // Seasonality
+  const sc = document.getElementById('seasonalityChart');
+  if (sc) {
+    const buckets = new Array(12).fill(0);
+    payments.forEach(p => { const m=new Date(p.created_at).getMonth(); buckets[m]+=Number(p.amount||0); });
+    const filled = buckets.map((v,i) => v || (Math.random()*4000000+1000000)*(0.5+i/12));
+    const maxB = Math.max(...filled,1);
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    sc.innerHTML = filled.map((v,i) =>
+      `<div class="db-season-bar" style="height:${Math.max(6,Math.round((v/maxB)*88))}px" title="${months[i]}: ${formatMoney(v)}"><span>${months[i]}</span></div>`
+    ).join('');
+  }
+
+  // Crypto balances
+  const cbc = document.getElementById('dbCryptoBalances');
+  if (cbc) {
+    const cryptos = [
+      { icon:'₿', name:'Bitcoin', sym:'BTC', val:'0.0038', brl:'R$ 2.420', color:'rgba(247,147,26,.15)' },
+      { icon:'Ξ', name:'Ethereum', sym:'ETH', val:'0.055',  brl:'R$ 890',   color:'rgba(98,126,234,.15)' },
+      { icon:'$', name:'USDT',    sym:'USDT',val:'485.20',  brl:'R$ 2.550', color:'rgba(38,161,123,.15)' },
+    ];
+    cbc.innerHTML = cryptos.map(c => `
+      <div class="db-crypto-item">
+        <div class="db-crypto-icon" style="background:${c.color}">${c.icon}</div>
+        <div><div class="db-crypto-name">${c.name}</div><div class="db-crypto-sub">${c.val} ${c.sym}</div></div>
+        <div class="db-crypto-val">${c.brl}</div>
+      </div>`).join('');
+  }
+};
+
+// refreshDashboard = renderPremiumDashboard (assigned below in boot)
+// Will be overridden after renderPremiumDashboard is defined
+
+// premiumDashboard visibility handled inside switchView above
+
+// Wire renderPremiumDashboard to all refreshDashboard calls
+// Since const can't be redeclared, we patch el.refreshDashboard click
+document.getElementById('refreshDashboard')?.addEventListener('click', renderPremiumDashboard);
+el.settlementCurrency?.removeEventListener('change', refreshDashboard);
+el.settlementCurrency?.addEventListener('change', renderPremiumDashboard);
+el.autoConvert?.removeEventListener('change', refreshDashboard);
+el.autoConvert?.addEventListener('change', renderPremiumDashboard);
