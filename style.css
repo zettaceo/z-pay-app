@@ -23,6 +23,20 @@
   --radius: 16px;
   --radius-lg: 22px;
   --shadow: 0 18px 60px rgba(0,0,0,.35);
+
+  /* ── Z-INDEX SCALE (única fonte de verdade) ──
+     Regra: sidebar > overlay. app NÃO cria stacking context.
+  */
+  --z-topbar:    50;
+  --z-overlay:  100;
+  --z-sidebar:  200;
+  --z-hamburger: 300;
+  --z-modal-bg: 400;
+  --z-modal:    500;
+  --z-toast:    600;
+  --z-zion:     700;
+  --z-tour:     800;
+  --z-login:    900;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -287,19 +301,10 @@ body.app-visible::before {
 
 button, a, .menu-item, .brand { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
-.app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+.app { display: flex; min-height: 100vh; }  /* NO z-index = no stacking context */
 
 /* Sidebar */
-.sidebar {
-  width: 260px;
-  background: rgba(15,16,26,.85);
-  backdrop-filter: blur(22px);
-  border-right: 1px solid var(--border);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
+/* .sidebar → see LAYERING ARCHITECTURE */
 
 .brand { display: flex; gap: 12px; align-items: center; }
 .logo {
@@ -1092,25 +1097,7 @@ input:focus, textarea:focus, select:focus {
 .link:hover { color: var(--cyan); text-decoration: underline; }
 
 /* Hamburger */
-.hamburger {
-  display: none;
-  position: fixed;
-  top: 18px; left: 18px;
-  z-index: 100;
-  width: 46px; height: 46px;
-  background: rgba(15,16,26,.9);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  cursor: pointer;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  transition: .25s;
-}
-.hamburger span { display: block; width: 20px; height: 2px; background: var(--text2); border-radius: 1px; transition: .25s; }
-.hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
-.hamburger.active span:nth-child(2) { opacity: 0; }
+/* hamburger → LAYERING ARCHITECTURE */
 .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
 
 /* Touch targets */
@@ -1140,28 +1127,13 @@ button.primary, button.ghost, button.danger { min-height: 44px; }
 }
 
 .app-wrap[hidden] { display: none !important; }
-.app-wrap { position: relative; z-index: 1; min-height: 100vh; }
+.app-wrap { position: relative; min-height: 100vh; }  /* NO z-index */
 
 @media (max-width: 960px) {
-  .hamburger { display: flex; }
-  .sidebar {
-    position: fixed;
-    top: 0; left: 0;
-    height: 100vh;
-    z-index: 90;
-    transform: translateX(-100%);
-    transition: transform .3s ease;
-    box-shadow: 4px 0 40px rgba(0,0,0,.5);
-  }
+  /* hamburger → see LAYERING ARCHITECTURE */
+  /* .sidebar mobile → see LAYERING ARCHITECTURE */
   .sidebar.open { transform: translateX(0); }
-  .sidebar-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.6);
-    z-index: 85;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .3s;
-  }
+  /* .sidebar-overlay → see LAYERING ARCHITECTURE */
   .sidebar-overlay[hidden] { display: none; }
   .sidebar-overlay:not([hidden]) { display: block; opacity: 1; pointer-events: auto; }
   .content { padding: 20px; padding-top: 60px; }
@@ -1254,12 +1226,7 @@ body .checkout .modal-card {
   box-shadow: 0 0 0 1px rgba(255,122,24,.4), 0 8px 32px rgba(255,122,24,.35), 0 0 60px rgba(255,122,24,.15) !important;
 }
 
-.sidebar {
-  background: rgba(7,7,12,.88) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255,255,255,.055);
-}
+/* consolidated → see LAYERING ARCHITECTURE below */
 
 .topbar {
   background: rgba(7,7,12,.82) !important;
@@ -1750,35 +1717,11 @@ body .checkout .modal-card {
   .topbar-title h1 { font-size: 17px !important; }
 
   /* SIDEBAR FIX */
-  .sidebar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    z-index: 3000 !important;
-    transform: translateX(-100%) !important;
-    transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
-    width: 270px !important;
-    overflow-y: auto;
-  }
+  /* consolidated → see LAYERING ARCHITECTURE below */
   .sidebar.open { transform: translateX(0) !important; }
-  .sidebar-overlay {
-    z-index: 2500 !important;
-    background: rgba(0,0,0,.72) !important;
-  }
+  /* consolidated → see LAYERING ARCHITECTURE below */
   .app { margin-left: 0 !important; }
-  .hamburger {
-    display: flex !important;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 4000;
-    background: rgba(10,14,24,.92);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 10px;
-    padding: 10px;
-    backdrop-filter: blur(12px);
-  }
+  /* hamburger mobile → LAYERING ARCHITECTURE */
   /* .menu-item mobile → see @layer components */
   .cards { grid-template-columns: 1fr 1fr !important; padding: 10px 12px !important; gap: 10px !important; }
   .panel { margin: 8px 10px !important; }
@@ -1804,11 +1747,7 @@ body.login-visible {
 }
 
 /* Premium sidebar */
-.sidebar {
-  background: rgba(5,5,10,.96) !important;
-  border-right: 1px solid rgba(255,122,24,.08) !important;
-  box-shadow: 4px 0 40px rgba(0,0,0,.6) !important;
-}
+/* consolidated → see LAYERING ARCHITECTURE below */
 
 .brand {
   border-bottom: 1px solid rgba(255,255,255,.055);
@@ -2228,41 +2167,14 @@ button.danger {
     border-bottom: 1px solid rgba(255,255,255,.05);
   }
 
-  .sidebar {
-    position: fixed !important;
-    top: 0; left: 0;
-    height: 100vh !important;
-    z-index: 3000 !important;
-    transform: translateX(-100%) !important;
-    transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
-    width: 260px !important;
-    overflow-y: auto;
-    background: rgba(4,4,9,.99) !important;
-  }
+  /* consolidated → see LAYERING ARCHITECTURE below */
   .sidebar.open { transform: translateX(0) !important; }
 
-  .sidebar-overlay {
-    position: fixed !important;
-    inset: 0;
-    z-index: 2500 !important;
-    background: rgba(0,0,0,.75) !important;
-    backdrop-filter: blur(3px);
-  }
+  /* consolidated → see LAYERING ARCHITECTURE below */
 
   .app { margin-left: 0 !important; }
 
-  .hamburger {
-    display: flex !important;
-    position: fixed;
-    top: 12px; left: 12px;
-    z-index: 4000;
-    background: rgba(8,8,16,.94);
-    border: 1px solid rgba(255,122,24,.15);
-    border-radius: 10px;
-    padding: 10px;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 4px 16px rgba(0,0,0,.4);
-  }
+  /* consolidated → see LAYERING ARCHITECTURE below */
 
   .cards {
     grid-template-columns: 1fr 1fr !important;
@@ -2675,14 +2587,8 @@ button.danger {
 ════════════════════════════════════ */
 
 /* Sidebar - fundo menos opaco para menu ser visível */
-.sidebar {
-  background: #0d0f1a !important;
-}
-@media (max-width: 768px) {
-  .sidebar {
-    background: #0c0e19 !important;
-  }
-}
+/* consolidated → see LAYERING ARCHITECTURE below */
+/* consolidated → see LAYERING ARCHITECTURE below */
 
 
 
@@ -2749,11 +2655,7 @@ button.danger {
 
 @layer components {
 
-  /* ── SIDEBAR NAVIGATION ── */
-  .sidebar {
-    background: #0d0f1a;
-    border-right: 1px solid rgba(255, 122, 24, 0.08);
-  }
+/* consolidated → see LAYERING ARCHITECTURE below */
 
   .menu-item {
     display: block;
@@ -2801,3 +2703,131 @@ button.danger {
   }
 
 }
+
+/* ════════════════════════════════════════════════════════════
+   LAYERING ARCHITECTURE — Única fonte de verdade
+   
+   Problema corrigido: .app tinha z-index:1 + position:relative
+   criando um stacking context que aprisionava o .sidebar dentro
+   dele. O .sidebar-overlay era irmão do .app então sempre ganhava
+   independente do z-index do sidebar.
+   
+   Solução: .app sem z-index (não cria stacking context).
+   Sidebar e overlay competem no mesmo contexto global.
+   Escala: overlay(100) < sidebar(200) < hamburger(300)
+   ════════════════════════════════════════════════════════════ */
+
+/* ── SIDEBAR ── */
+.sidebar {
+  /* Layout desktop: coluna fixa à esquerda */
+  width: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  /* Visual */
+  background: #0e1020;
+  border-right: 1px solid rgba(255, 122, 24, 0.08);
+
+  /* Glassmorphism só quando o hardware suporta */
+  @supports (backdrop-filter: blur(1px)) {
+    background: rgba(8, 9, 18, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* ── SIDEBAR OVERLAY ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  /* z-index ABAIXO do sidebar — sempre */
+  z-index: var(--z-overlay); /* 100 */
+  cursor: pointer;
+}
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ── HAMBURGER ── */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  /* z-index ACIMA do sidebar — sempre */
+  z-index: var(--z-hamburger); /* 300 */
+  background: rgba(8, 9, 18, 0.92);
+  border: 1px solid rgba(255, 122, 24, 0.18);
+  border-radius: 10px;
+  padding: 10px 11px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #c8cfe0;
+  border-radius: 2px;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+  margin: 4px 0;
+}
+.hamburger.active span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; }
+.hamburger.active span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  /* Sidebar vira drawer off-canvas */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;       /* Dynamic viewport height — evita barra do browser */
+    width: 270px;
+    max-width: 85vw;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    /* ACIMA do overlay — z-index compete no contexto global correto */
+    z-index: var(--z-sidebar); /* 200 > overlay(100) */
+
+    /* Começa fora da tela */
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Sombra lateral */
+    box-shadow: 4px 0 48px rgba(0, 0, 0, 0.6);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* App sem margin, sidebar flutua por cima */
+  .app {
+    margin-left: 0 !important;
+  }
+
+  /* Hamburger visível */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Topbar com espaço para o hamburger */
+  .topbar {
+    padding-left: 58px !important;
+  }
+
+  /* Topbar actions ocultas — ficam no mobile-actions */
+  .topbar-actions {
+    display: none !important;
+  }
+}
+

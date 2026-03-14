@@ -652,13 +652,15 @@ if (el.modalBackdrop) el.modalBackdrop.addEventListener('click', closeAllModals)
 const closeSidebar = () => {
   el.sidebar?.classList.remove('open');
   el.hamburger?.classList.remove('active');
-  if (el.sidebarOverlay) { el.sidebarOverlay.hidden=true; el.sidebarOverlay.setAttribute('aria-hidden','true'); }
+  el.sidebarOverlay?.classList.remove('active');
+  el.sidebarOverlay?.setAttribute('aria-hidden', 'true');
 };
 const toggleSidebar = () => {
   const isOpen = !el.sidebar?.classList.contains('open');
-  el.sidebar?.classList.toggle('open',isOpen);
-  el.hamburger?.classList.toggle('active',isOpen);
-  if (el.sidebarOverlay) { el.sidebarOverlay.hidden=!isOpen; el.sidebarOverlay.setAttribute('aria-hidden',!isOpen); }
+  el.sidebar?.classList.toggle('open', isOpen);
+  el.hamburger?.classList.toggle('active', isOpen);
+  el.sidebarOverlay?.classList.toggle('active', isOpen);
+  el.sidebarOverlay?.setAttribute('aria-hidden', String(!isOpen));
 };
 el.hamburger?.addEventListener('click', toggleSidebar);
 el.sidebarOverlay?.addEventListener('click', closeSidebar);
