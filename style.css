@@ -2725,6 +2725,7 @@ button.danger {
   display: flex;
   flex-direction: column;
   gap: 0;
+  padding: 16px 0;
 
   /* Visual */
   background: #0e1020;
@@ -2828,6 +2829,412 @@ button.danger {
   /* Topbar actions ocultas — ficam no mobile-actions */
   .topbar-actions {
     display: none !important;
+  }
+}
+
+
+/* ════════════════════════════════════
+   VISUAL FIXES — Menu + Mobile
+════════════════════════════════════ */
+
+/* Nav container — menos gap entre items */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px;
+}
+
+/* Sidebar padding — merged into main rule above */
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.brand-logo-img {
+  width: 32px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  color: #f0f2f7;
+  letter-spacing: -.01em;
+}
+.brand-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #59627a;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Sidebar lang */
+.sidebar-lang {
+  padding: 8px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  margin-bottom: 6px;
+}
+.sidebar-lang-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #59627a;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 16px;
+  display: flex;
+  gap: 6px;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+
+/* ── MOBILE ACTIONS BAR — compacta ── */
+.mobile-actions {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(5,5,10,.98);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.btn-mob-action {
+  flex: 1 1 calc(50% - 3px);
+  padding: 9px 8px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: #8b95a8;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .12s, color .12s;
+  white-space: nowrap;
+  min-height: 0;
+}
+.btn-mob-primary {
+  background: linear-gradient(135deg, #ff7a18, #ff4d00) !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  border: none !important;
+  flex: 1 1 100% !important;
+  box-shadow: 0 3px 12px rgba(255,122,24,.3);
+}
+.btn-mob-danger {
+  background: rgba(239,68,68,.08) !important;
+  color: #f87171 !important;
+  border-color: rgba(239,68,68,.15) !important;
+}
+.btn-mob-green {
+  background: rgba(52,211,153,.08) !important;
+  color: #34d399 !important;
+  border-color: rgba(52,211,153,.15) !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-actions { display: flex; }
+  .topbar-actions  { display: none !important; }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE COMPLETENESS — Mobile + Tablet + Desktop
+   Covers all 20 views systematically
+   ════════════════════════════════════════════════════════════ */
+
+/* ── TABLE WRAPPER — overflow horizontal em mobile ── */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+/* ── FEATURE GRIDS (substituem inline styles) ── */
+.feature-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.feature-2col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.feature-main-aside-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+.db-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ── CONTENT AREA ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── TOPBAR sticky ── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+}
+
+/* ═══════════════════════════════════════════
+   @media (max-width: 768px) — Android phones
+   ═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Content: precisa de padding-top para o hamburger + mobile-actions */
+  .content {
+    padding-top: 0 !important;
+  }
+  .topbar {
+    padding-left: 58px !important;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-topbar);
+  }
+
+  /* Todos os panels com padding menor */
+  .panel, .db-card {
+    padding: 14px !important;
+    margin-bottom: 10px;
+    border-radius: 14px !important;
+  }
+
+  /* Feature grids → 1 coluna */
+  .feature-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .feature-2col-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .feature-main-aside-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Plans grid */
+  .plans-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .plan-card {
+    padding: 20px !important;
+  }
+
+  /* Analytics grid */
+  .analytics-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .analytics-card {
+    padding: 16px !important;
+  }
+
+  /* Onboarding */
+  .onboarding-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Roadmap */
+  .roadmap-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Advanced insights */
+  .advanced-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .advanced-card {
+    padding: 14px !important;
+  }
+
+  /* Tables — scroll horizontal */
+  .table-wrapper,
+  .table,
+  .table-charges,
+  .table-payments,
+  .table-recent,
+  .table-payouts,
+  .contador-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Table rows — em mobile vira 2 colunas chave:valor */
+  .table-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    font-size: 11px !important;
+    padding: 10px 12px !important;
+    gap: 4px !important;
+  }
+  .table-row.table-header {
+    display: none !important; /* header não faz sentido em 2col */
+  }
+
+  /* Docs */
+  .docs-content { padding: 0 !important; }
+  .docs-terminal { overflow-x: auto !important; }
+  .docs-code { font-size: 11px !important; white-space: pre !important; }
+  .docs-endpoints { overflow-x: auto !important; }
+
+  /* Settings form */
+  .form { gap: 12px !important; }
+  .form label { font-size: 13px !important; }
+  .form input, .form select { font-size: 14px !important; }
+
+  /* Split panel */
+  .split-panel { flex-direction: column !important; gap: 10px !important; }
+  .split-row { flex-wrap: wrap !important; gap: 6px !important; }
+
+  /* Conversion panel */
+  .conversion-panel {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .conversion-controls {
+    width: 100% !important;
+  }
+
+  /* Method chart */
+  .method-chart-panel { padding: 14px !important; }
+  .method-bar-row { gap: 8px !important; }
+  .method-label { font-size: 10px !important; width: 40px !important; }
+
+  /* Webhooks sim */
+  .webhook-sim { flex-direction: column !important; }
+  .webhook-console { font-size: 11px !important; }
+
+  /* Modais */
+  .modal-card {
+    width: calc(100vw - 24px) !important;
+    max-width: none !important;
+    margin: 12px !important;
+    max-height: calc(100dvh - 24px) !important;
+    overflow-y: auto !important;
+  }
+
+  /* Topbar title */
+  .topbar-title h1 { font-size: 17px !important; }
+  .topbar-title p  { font-size: 11px !important; }
+
+  /* Premium dashboard */
+  #premiumDashboard { padding: 10px 12px !important; gap: 10px !important; }
+  .db-kpi-value { font-size: 18px !important; }
+  .db-card { padding: 14px !important; border-radius: 13px !important; }
+  .db-card-title { font-size: 13px !important; }
+
+  /* ZION widget */
+  #zionWidget  { bottom: 14px; right: 14px; }
+  .zion-chat   { width: calc(100vw - 28px) !important; }
+
+  /* Realtime toast */
+  .realtime-toast { right: 12px !important; bottom: 70px !important; min-width: 230px !important; }
+
+  /* Tour card */
+  .zion-tour-card { width: calc(100vw - 20px) !important; bottom: 10px !important; }
+
+  /* Linkbio */
+  .linkbio-preview { flex-direction: column !important; }
+  .linkbio-url { flex-wrap: wrap !important; gap: 6px !important; }
+
+  /* Roadmap tabs */
+  .roadmap-tabs { flex-wrap: wrap !important; gap: 6px !important; }
+  .roadmap-card { padding: 16px !important; }
+
+  /* Plan cards */
+  .plan-card.plan-featured { order: -1 !important; }
+
+  /* Pagination */
+  .pagination { flex-wrap: wrap !important; gap: 8px !important; font-size: 12px !important; }
+
+  /* Contador */
+  .contador-metric-value { font-size: 20px !important; }
+  .contador-table { font-size: 11px !important; }
+  .contador-table th, .contador-table td { padding: 8px 6px !important; }
+}
+
+/* ═══════════════════════════════════════════
+   @media (max-width: 480px) — Telas muito pequenas
+   ═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .db-kpi-row { grid-template-columns: 1fr 1fr !important; }
+  .db-kpi-value { font-size: 16px !important; }
+  .db-kpi-label { font-size: 9px !important; }
+  
+  .btn-mob-action { font-size: 11px !important; padding: 8px 6px !important; }
+  
+  .plan-card { padding: 16px !important; }
+  .plan-price { font-size: 26px !important; }
+  
+  .modal-card { margin: 8px !important; width: calc(100vw - 16px) !important; }
+  
+  .topbar-title h1 { font-size: 15px !important; }
+}
+
+/* ═══════════════════════════════════════════
+   Desktop — sidebar fixa, sem hamburger
+   ═══════════════════════════════════════════ */
+@media (min-width: 769px) {
+  .app {
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .content {
+    flex: 1;
+    min-width: 0; /* prevent grid blowout */
+  }
+  .hamburger {
+    display: none !important;
+  }
+  .mobile-actions {
+    display: none !important;
+  }
+  .sidebar-overlay {
+    display: none !important;
+  }
+  /* Topbar actions visíveis no desktop */
+  .topbar-actions {
+    display: flex !important;
   }
 }
 

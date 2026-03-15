@@ -763,9 +763,54 @@ document.getElementById('requestAdvance')?.addEventListener('click',()=>{ const 
 [1,2,3].forEach(i=>{ document.getElementById(`splitPct${i}`)?.addEventListener('input',()=>{ const total=[1,2,3].reduce((s,j)=>s+Number(document.getElementById(`splitPct${j}`)?.value||0),0); const st=document.getElementById('splitTotal'); if(st) st.textContent=`Total: ${total}%`; }); });
 
 // ── IDIOMA ────────────────────────────
-document.querySelectorAll('.lang-btn,.lang-option,.lang-option-flag,.docs-lang-btn').forEach(btn=>{
-  if(btn._lb) return; btn._lb=true;
-  btn.addEventListener('click',()=>{ if(typeof setLang==='function') setLang(btn.dataset.lang); });
+const applyI18n = () => {
+  if (typeof t !== 'function') return;
+  // Traduzir todos os elementos com data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(node => {
+    const val = t(node.dataset.i18n);
+    if (val && val !== node.dataset.i18n) node.textContent = val;
+  });
+  // Placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(node => {
+    const val = t(node.dataset.i18nPlaceholder);
+    if (val) node.placeholder = val;
+  });
+  // Atualizar botões de idioma
+  const lang = typeof getLang === 'function' ? getLang() : 'pt';
+  document.querySelectorAll('.lang-btn,.lang-option,.lang-option-flag,.docs-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  // Títulos da view ativa
+  const activeView = document.querySelector('.menu-item.active')?.dataset.view;
+  const VIEW_MAP = {
+    dashboard:     ['menu_dashboard','subtitle_dashboard'],
+    charges:       ['menu_charges','subtitle_charges'],
+    payments:      ['menu_payments','subtitle_payments'],
+    payouts:       ['menu_payouts','subtitle_payouts'],
+    webhooks:      ['menu_webhooks','subtitle_webhooks'],
+    analytics:     ['menu_analytics','subtitle_analytics'],
+    plans:         ['menu_plans','subtitle_plans'],
+    linkbio:       ['menu_linkbio','subtitle_linkbio'],
+    subscriptions: ['menu_subscriptions','subtitle_subscriptions'],
+    roadmap:       ['menu_roadmap','subtitle_roadmap'],
+    docs:          ['menu_docs','subtitle_docs'],
+    onboarding:    ['menu_onboarding','subtitle_onboarding'],
+    settings:      ['menu_settings','subtitle_settings'],
+  };
+  if (activeView && VIEW_MAP[activeView] && el.viewTitle) {
+    el.viewTitle.textContent   = t(VIEW_MAP[activeView][0]);
+    el.viewSubtitle.textContent = t(VIEW_MAP[activeView][1]);
+  }
+  if (el.planBadge && state.merchant) el.planBadge.textContent = `${t('plan')} ${state.merchant.plan}`;
+  if (el.kycBadge  && state.merchant) el.kycBadge.textContent  = `KYC ${state.merchant.kyc_status}`;
+};
+
+document.querySelectorAll('.lang-btn,.lang-option,.lang-option-flag,.docs-lang-btn').forEach(btn => {
+  if (btn._lb) return; btn._lb = true;
+  btn.addEventListener('click', () => {
+    if (typeof setLang === 'function') setLang(btn.dataset.lang);
+    applyI18n();
+  });
 });
 
 // ══════════════════════════════════════
@@ -965,17 +1010,17 @@ document.getElementById('tourOverlay')?.addEventListener('click', endTour);
 // ══════════════════════════════════════
 const boot = async () => {
   if (el.apiBaseInput) el.apiBaseInput.value='DEMO MODE';
+  // Apply translations on load
+  applyI18n();
   if (state.token) {
     setAuthUI(true);
     await loadMerchant();
     await renderPremiumDashboard();
+    applyI18n();
     setTimeout(()=>initZionWidget(), 400);
   } else {
     setAuthUI(false);
   }
-  document.querySelectorAll('.lang-option,.lang-option-flag,.lang-btn').forEach(btn=>{
-    if(typeof getLang==='function') btn.classList.toggle('active',btn.dataset.lang===getLang());
-  });
 };
 boot();
 
@@ -995,7 +1040,7 @@ const refreshCheckoutAdaptativo = () => {
     { icon: '⏰', label: 'Link expirando em menos de 1h', action: 'Mostrar contador de urgência', on: true },
   ];
   const statsHtml = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    <div class="feature-stats-grid">
       <div class="card"><div class="card-title">Taxa de Conversão</div><div class="card-value" style="color:var(--mint)">87,4%</div><div class="card-sub">+14% vs padrão</div></div>
       <div class="card"><div class="card-title">Descontos Aplicados</div><div class="card-value">R$ 1.240</div><div class="card-sub">18 ofertas aceitas</div></div>
       <div class="card"><div class="card-title">Receita Recuperada</div><div class="card-value" style="color:var(--ember)">R$ 8.900</div><div class="card-sub">carrinhos salvos</div></div>
@@ -1042,12 +1087,12 @@ const refreshPagamentoPreditivo = () => {
       <span class="predict-pct" style="color:${h.level==='high'?'var(--mint)':h.level==='medium'?'var(--amber)':'#f87171'}">${h.pct}%</span>
     </div>`).join('');
   c.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    <div class="feature-stats-grid">
       <div class="card"><div class="card-title">Melhor Dia</div><div class="card-value" style="color:var(--mint)">Sexta</div><div class="card-sub">94% aprovação</div></div>
       <div class="card"><div class="card-title">Melhor Hora</div><div class="card-value" style="color:var(--mint)">14–18h</div><div class="card-sub">91% aprovação</div></div>
       <div class="card"><div class="card-title">Ganho Estimado</div><div class="card-value" style="color:var(--ember)">+R$ 34k</div><div class="card-sub">por mês com otimização</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="feature-2col-grid">
       <div>
         <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Taxa por Dia da Semana</h2></div>
         ${barsDay}
@@ -1096,12 +1141,12 @@ const refreshSistemaNervoso = () => {
       <div class="adaptive-toggle ${ch.on?'':'off'}"></div>
     </div>`).join('');
   c.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    <div class="feature-stats-grid">
       <div class="card"><div class="card-title">Alertas Hoje</div><div class="card-value">12</div><div class="card-sub">3 críticos, 9 info</div></div>
       <div class="card"><div class="card-title">Ações Automáticas</div><div class="card-value" style="color:var(--mint)">8</div><div class="card-sub">ZION agiu por você</div></div>
       <div class="card"><div class="card-title">Valor Monitorado</div><div class="card-value" style="color:var(--ember)">R$ 967k</div><div class="card-sub">em tempo real</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+    <div class="feature-main-aside-grid">
       <div>
         <div class="panel-header" style="margin-bottom:14px"><h2 style="font-size:14px">Feed de Inteligência</h2></div>
         ${alertsHtml}
@@ -1137,7 +1182,7 @@ const refreshNotaFiscal = () => {
       </div>
     </div>`).join('');
   c.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    <div class="feature-stats-grid">
       <div class="card"><div class="card-title">Notas Emitidas</div><div class="card-value" style="color:var(--mint)">47</div><div class="card-sub">este mês</div></div>
       <div class="card"><div class="card-title">Economia Tributária</div><div class="card-value" style="color:var(--ember)">R$ 3.840</div><div class="card-sub">via otimização ZION</div></div>
       <div class="card"><div class="card-title">Imposto Médio</div><div class="card-value">2,1%</div><div class="card-sub">vs 3,8% sem otimização</div></div>
@@ -1183,7 +1228,7 @@ const refreshAgentic = () => {
       <span class="agent-status ${a.status}">${a.status==='active'?'● Ativo':'Em breve'}</span>
     </div>`).join('');
   c.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+    <div class="feature-stats-grid">
       <div class="card"><div class="card-title">Vendas via IA</div><div class="card-value" style="color:var(--mint)">14</div><div class="card-sub">este mês</div></div>
       <div class="card"><div class="card-title">Volume Agentic</div><div class="card-value" style="color:var(--ember)">R$ 18.400</div><div class="card-sub">sem intervenção humana</div></div>
       <div class="card"><div class="card-title">Agentes Ativos</div><div class="card-value">2</div><div class="card-sub">de 4 disponíveis</div></div>
