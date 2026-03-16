@@ -2726,6 +2726,10 @@ button.danger {
   flex-direction: column;
   gap: 0;
   padding: 16px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,122,24,.2) transparent;
 
   /* Visual */
   background: #0e1020;
@@ -3238,3 +3242,41 @@ button.danger {
   }
 }
 
+
+/* ── SIDEBAR SCROLL INDICATOR ── */
+/* Gradiente que indica visualmente que há mais conteúdo abaixo */
+.sidebar-footer {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, #0e1020 40%);
+  padding-top: 20px;
+  margin-top: auto;
+}
+
+/* Scrollbar WebKit (Chrome/Android) */
+.sidebar::-webkit-scrollbar {
+  width: 3px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 122, 24, 0.25);
+  border-radius: 100px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 122, 24, 0.5);
+}
+
+/* Mobile: overflow-y no sidebar aberto */
+@media (max-width: 768px) {
+  .sidebar {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    /* Scroll indicator mais forte no mobile */
+    -webkit-overflow-scrolling: touch;
+  }
+  .sidebar-footer {
+    background: linear-gradient(to bottom, transparent 0%, #0c0e19 40%);
+  }
+}

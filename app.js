@@ -551,8 +551,8 @@ const VIEW_TITLES = {
   docs:['Documentação','API Reference'],
   onboarding:['Onboarding','KYC e ativação'],
   settings:['Configurações','Chaves e integrações'],
-  contador:['Painel Contador','Gestão da carteira'],
-  chargebacks:['Chargebacks','Disputas e contestações'],
+  'contador':   ['Painel Contador','Gestão da carteira'],
+  'chargebacks':['Chargebacks','Disputas e contestações'],
 };
 
 const switchView = (view) => {
@@ -1280,43 +1280,63 @@ const drawSparkline = (svgId, values, color) => {
 const drawAreaChart = (payments) => {
   const svg = document.getElementById('dbAreaChart'); if (!svg) return;
   const legend = document.getElementById('dbAreaLegend'); if (!legend) return;
+
   const methods = { PIX:'#ff7a18', CARD:'#38bdf8', BOLETO:'#a78bfa', CRYPTO:'#34d399' };
   const days = 14;
+
+  // Dados estáticos — gráfico estável sem re-render diferente a cada load
+  const STATIC_SEEDS = {
+    PIX:    [4200,5100,3800,6200,5800,7100,6500,8200,7400,9100,8300,10200,9500,11000],
+    CARD:   [6800,7200,6100,7900,8400,7600,8900,8100,9400,8700,9800,9100,10500,9800],
+    BOLETO: [2100,2800,2400,3100,2700,3400,3000,3700,3300,4000,3600,4300,3900,4600],
+    CRYPTO: [800, 950, 700, 1100,900, 1300,1050,1400,1200,1600,1350,1750,1500,1900],
+  };
+
+  // Merge com dados reais (se existirem)
   const data = {};
-  Object.keys(methods).forEach(m => { data[m] = new Array(days).fill(0); });
+  Object.keys(methods).forEach(m => { data[m] = [...STATIC_SEEDS[m]]; });
   payments.forEach(p => {
     const m = p.method; if (!data[m]) return;
     const age = Math.floor((Date.now() - new Date(p.created_at).getTime()) / 86400000);
     const idx = Math.min(days - 1, Math.max(0, days - 1 - age));
     data[m][idx] += Number(p.amount || 0) / 100;
   });
-  // Inflate for demo
-  Object.keys(data).forEach(m => {
-    data[m] = data[m].map((v, i) => v || (Math.random() * 8000 + 2000) * (0.6 + i/days*0.8));
-  });
+
   const W = 600, H = 160;
   const allVals = Object.values(data).flat();
   const maxV = Math.max(...allVals, 1);
-  let svgContent = '';
+
+  // ── SVG montado em ordem correta ──────────────────────────
+  // 1. <defs> ÚNICO fora do forEach — IDs únicos, sem duplicação
+  // 2. Grid lines — camada mais abaixo
+  // 3. Áreas preenchidas — meio
+  // 4. Linhas — topo
+
+  const defsHtml = `<defs>${
+    Object.entries(methods).map(([m, color]) => `
+      <linearGradient id="ag${m}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="${color}" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient>`).join('')
+  }</defs>`;
+
+  const gridHtml = [0,1,2,3,4].map(i => {
+    const y = Math.round((i / 4) * H);
+    return `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="rgba(255,255,255,.05)" stroke-width="1"/>`;
+  }).join('');
+
+  let areasHtml = '', linesHtml = '';
   Object.entries(methods).forEach(([m, color]) => {
     const vals = data[m];
-    const pts = vals.map((v, i) => `${(i/(days-1))*W},${H - (v/maxV)*(H-8) - 4}`).join(' L ');
-    svgContent += `
-      <defs>
-        <linearGradient id="ag${m}" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
-          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <path d="M ${pts} L ${W},${H} L 0,${H} Z" fill="url(#ag${m})"/>
-      <path d="M ${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+    const pts = vals.map((v, i) =>
+      `${Math.round((i / (days - 1)) * W)},${Math.round(H - (v / maxV) * (H - 8) - 4)}`
+    ).join(' L ');
+    areasHtml += `<path d="M ${pts} L ${W},${H} L 0,${H} Z" fill="url(#ag${m})"/>`;
+    linesHtml += `<path d="M ${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
   });
-  // Grid lines
-  for (let i = 0; i <= 4; i++) {
-    const y = (i/4) * H;
-    svgContent = `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>` + svgContent;
-  }
-  svg.innerHTML = svgContent;
+
+  svg.innerHTML = defsHtml + gridHtml + areasHtml + linesHtml;
+
   legend.innerHTML = Object.entries(methods).map(([m, color]) =>
     `<div class="db-legend-item"><div class="db-legend-dot" style="background:${color}"></div>${m}</div>`
   ).join('');
@@ -1389,7 +1409,8 @@ const renderPremiumDashboard = async () => {
   if (sc) {
     const buckets = new Array(12).fill(0);
     payments.forEach(p => { const m=new Date(p.created_at).getMonth(); buckets[m]+=Number(p.amount||0); });
-    const filled = buckets.map((v,i) => v || (Math.random()*4000000+1000000)*(0.5+i/12));
+    const SEASON_SEEDS = [3200000,2800000,4100000,3700000,5200000,4800000,6100000,5700000,7200000,8300000,9100000,10500000];
+    const filled = buckets.map((v,i) => v || SEASON_SEEDS[i] || 3000000);
     const maxB = Math.max(...filled,1);
     const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     sc.innerHTML = filled.map((v,i) =>
