@@ -1,0 +1,993 @@
+export const bodyHtml = `  <!-- Tela de login full-screen: única visível quando não autenticado -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-screen-bg"></div>
+    <div class="login-screen-content">
+      <div class="login-brand">
+        <div class="login-logo-wrap">
+          <img src="zpay-logo.png" class="login-logo-img" alt="Z-PAY"/>
+        </div>
+        <h1 class="login-title" data-i18n="brand_title">Z-PAY</h1>
+        <p class="login-tagline" data-i18n="brand_tagline">Gateway de pagamentos para quem exige mais</p>
+      </div>
+      <div class="login-card">
+        <h2 data-i18n="login_title">Login do merchant</h2>
+        <p class="login-demo-hint" data-i18n="login_demo">Use o demo: demo@zpay.com / demo123</p>
+        <form id="loginForm" class="form">
+          <label><span data-i18n="email">Email</span>
+            <input id="loginEmail" type="email" required />
+          </label>
+          <label><span data-i18n="password">Senha</span>
+            <input id="loginPassword" type="password" required />
+          </label>
+          <button class="primary login-submit" type="submit" data-i18n="enter">Entrar</button>
+          <button class="ghost login-demo-btn" type="button" id="demoLogin" data-i18n="demo_login">Entrar demo</button>
+        </form>
+        <div class="error" id="loginError" hidden></div>
+      </div>
+      <div class="login-lang-wrap">
+        <span class="login-lang-label" data-i18n="language">Idioma</span>
+        <div class="lang-selector lang-selector-flags lang-selector-login" id="langSelectorLogin">
+          <button type="button" class="lang-option-flag active" data-lang="pt" aria-label="Português" title="Português"><span class="lang-flag">🇧🇷</span><span class="lang-code"> PT</span></button>
+          <button type="button" class="lang-option-flag" data-lang="en" aria-label="English" title="English"><span class="lang-flag">🇺🇸</span><span class="lang-code"> EN</span></button>
+          <button type="button" class="lang-option-flag" data-lang="zh" aria-label="中文" title="中文"><span class="lang-flag">🇨🇳</span><span class="lang-code"> 中文</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App (dashboard): visível apenas após login -->
+  <div class="app-wrap" id="appWrap" hidden>
+  <button class="hamburger" id="hamburger" aria-label="Abrir menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay" hidden aria-hidden="true"></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand" id="brandHome" role="button" aria-label="Voltar ao dashboard">
+        <img src="zpay-logo.png" class="brand-logo-img" alt="Z-PAY"/>
+        <div>
+          <div class="brand-name">Z-PAY</div>
+          <div class="brand-sub" data-i18n="brand_sub">Gateway SaaS</div>
+        </div>
+      </div>
+      <div class="sidebar-lang">
+        <span class="sidebar-lang-label" data-i18n="language">Idioma</span>
+        <div class="lang-selector lang-selector-flags" id="langSelectorSidebar">
+          <button type="button" class="lang-option-flag" data-lang="pt" aria-label="Português" title="Português"><span class="lang-flag" aria-hidden="true">🇧🇷</span><span class="lang-code"> PT</span></button>
+          <button type="button" class="lang-option-flag" data-lang="en" aria-label="English" title="English"><span class="lang-flag" aria-hidden="true">🇺🇸</span><span class="lang-code"> EN</span></button>
+          <button type="button" class="lang-option-flag" data-lang="zh" aria-label="中文" title="中文"><span class="lang-flag" aria-hidden="true">🇨🇳</span><span class="lang-code"> 中文</span></button>
+        </div>
+      </div>
+      <nav class="menu">
+        <button class="menu-item active" data-view="dashboard" data-i18n="menu_dashboard">Dashboard</button>
+        <button class="menu-item" data-view="charges" data-i18n="menu_charges">Cobranças</button>
+        <button class="menu-item" data-view="payments" data-i18n="menu_payments">Pagamentos</button>
+        <button class="menu-item" data-view="payouts" data-i18n="menu_payouts">Payouts</button>
+        <button class="menu-item" data-view="webhooks" data-i18n="menu_webhooks">Webhooks</button>
+        <button class="menu-item" data-view="analytics" data-i18n="menu_analytics">Analytics</button>
+        <button class="menu-item" data-view="plans" data-i18n="menu_plans">Planos</button>
+        <button class="menu-item" data-view="linkbio" data-i18n="menu_linkbio">Meu Link</button>
+        <button class="menu-item" data-view="subscriptions" data-i18n="menu_subscriptions">Assinaturas</button>
+        <button class="menu-item" data-view="roadmap" data-i18n="menu_roadmap">Roadmap</button>
+        <button class="menu-item" data-view="docs" data-i18n="menu_docs">Documentação</button>
+        <button class="menu-item" data-view="onboarding" data-i18n="menu_onboarding">Onboarding</button>
+        <button class="menu-item" data-view="settings" data-i18n="menu_settings">Configurações</button>
+        <button class="menu-item" data-view="contador" data-i18n="menu_contador">Painel Contador</button>
+        <button class="menu-item" data-view="chargebacks" data-i18n="menu_chargebacks">Chargebacks</button>
+        <button class="menu-item" data-view="checkout-adaptativo" data-i18n="menu_checkout_ia">Checkout IA</button>
+        <button class="menu-item" data-view="pagamento-preditivo" data-i18n="menu_predicao">Predição</button>
+        <button class="menu-item" data-view="sistema-nervoso" data-i18n="menu_sistema_nervoso">Sistema Nervoso</button>
+        <button class="menu-item" data-view="nota-fiscal" data-i18n="menu_nota_fiscal">Nota Fiscal</button>
+        <button class="menu-item" data-view="agentic" data-i18n="menu_agentic">Agentic Commerce</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="pill" id="planBadge">Plano -</div>
+        <div class="pill" id="kycBadge">KYC -</div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1 id="viewTitle">Dashboard</h1>
+          <p id="viewSubtitle">Visão consolidada da operação</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn-demo-live" id="btnDemoLive">▶ Demo Ao Vivo</button>
+          <button class="ghost" id="btnGenerateReport">📄 Gerar Relatório</button>
+          <a href="#" class="ghost topbar-link" id="zfinanceLink" target="_blank">Z-Finance</a>
+          <button class="ghost" id="openCheckout" data-i18n="open_checkout">Abrir checkout</button>
+          <button class="primary" id="openCharge" data-i18n="new_charge">Nova cobrança</button>
+          <button class="danger" id="logoutBtn" data-i18n="logout">Sair</button>
+        </div>
+      </header>
+
+      <!-- MOBILE ACTIONS BAR -->
+      <div class="mobile-actions" id="mobileActions">
+        <button class="btn-mob-action btn-mob-green" id="mobDemoLive">▶ Demo Ao Vivo</button>
+        <button class="btn-mob-action" id="mobReport">📄 Relatório</button>
+        <button class="btn-mob-action" id="mobCheckout">Checkout</button>
+        <button class="btn-mob-action btn-mob-primary" id="mobNewCharge">Nova cobrança</button>
+        <button class="btn-mob-action btn-mob-danger" id="mobLogout">Sair</button>
+      </div>
+
+      <!-- PREMIUM DASHBOARD BENTO GRID -->
+      <div id="premiumDashboard" style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+
+        <!-- ROW 1: KPI Cards com sparklines -->
+        <div class="db-kpi-row" id="dbKpiRow">
+          <div class="db-kpi-card" id="kpiVolume">
+            <div class="db-kpi-label">VOLUME TOTAL</div>
+            <div class="db-kpi-value" id="volumeTotal">R$ 0,00</div>
+            <div class="db-kpi-delta positive" id="volumeTrend">+12% vs 30d</div>
+            <svg class="db-sparkline" id="sparkVolume" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="db-kpi-card" id="kpiRevenue">
+            <div class="db-kpi-label">RECEITA LÍQUIDA</div>
+            <div class="db-kpi-value" id="merchantRevenue">R$ 0,00</div>
+            <div class="db-kpi-delta positive" id="revenueTrend">+8% vs 30d</div>
+            <svg class="db-sparkline" id="sparkRevenue" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="db-kpi-card" id="kpiFees">
+            <div class="db-kpi-label">FEES COBRADAS</div>
+            <div class="db-kpi-value" id="feesTotal">R$ 0,00</div>
+            <div class="db-kpi-delta neutral" id="feesTrend">Estável</div>
+            <svg class="db-sparkline" id="sparkFees" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="db-kpi-card" id="kpiBalance">
+            <div class="db-kpi-label">SALDO DISPONÍVEL</div>
+            <div class="db-kpi-value" id="balance">R$ 0,00</div>
+            <div class="db-kpi-delta positive" id="balanceTrend">Atualizado agora</div>
+            <svg class="db-sparkline" id="sparkBalance" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+
+        <!-- ROW 2: Gráfico de área + Métodos + Cripto -->
+        <div class="db-row-2">
+
+          <!-- Gráfico de área principal -->
+          <div class="db-card db-area-card">
+            <div class="db-card-header">
+              <div>
+                <div class="db-card-title">Faturamento por Método</div>
+                <div class="db-card-subtitle" id="dbAreaSubtitle">Últimos 30 dias</div>
+              </div>
+              <div class="db-chip-row">
+                <span class="db-chip active" data-period="30">30d</span>
+                <span class="db-chip" data-period="7">7d</span>
+                <span class="db-chip" data-period="90">90d</span>
+              </div>
+            </div>
+            <div class="db-area-wrap">
+              <svg id="dbAreaChart" class="db-area-svg" viewBox="0 0 600 180" preserveAspectRatio="none"></svg>
+              <div class="db-area-legend" id="dbAreaLegend"></div>
+            </div>
+          </div>
+
+          <!-- Métodos + Risco -->
+          <div class="db-col-right">
+            <!-- Distribuição métodos -->
+            <div class="db-card db-methods-card">
+              <div class="db-card-header">
+                <div class="db-card-title">Distribuição</div>
+                <span class="db-badge-ok">● Live</span>
+              </div>
+              <div id="dbMethodsChart"></div>
+            </div>
+            <!-- Risco / KPIs rápidos -->
+            <div class="db-card db-risk-card">
+              <div class="db-card-header">
+                <div class="db-card-title">Score de Risco</div>
+                <div class="db-risk-score" id="dbRiskScore">10</div>
+              </div>
+              <div class="db-risk-bar-wrap">
+                <div class="db-risk-bar" id="dbRiskBar"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Aprovação</div>
+                  <div class="db-mini-val green" id="approvalRate">100%</div>
+                </div>
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Ticket Médio</div>
+                  <div class="db-mini-val" id="avgTicket">R$ 0</div>
+                </div>
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Chargebacks</div>
+                  <div class="db-mini-val green">0,00%</div>
+                </div>
+                <div class="db-mini-stat">
+                  <div class="db-mini-label">Uptime</div>
+                  <div class="db-mini-val green">99,98%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: Transações recentes + Sazonalidade + Cripto -->
+        <div class="db-row-3">
+
+          <!-- Transações recentes premium -->
+          <div class="db-card db-txn-card">
+            <div class="db-card-header">
+              <div class="db-card-title">Transações Recentes</div>
+              <button class="ghost db-refresh-btn" id="refreshDashboard">↻ Atualizar</button>
+            </div>
+            <div id="recentPayments" class="db-txn-list"></div>
+          </div>
+
+          <!-- Sazonalidade premium -->
+          <div class="db-card db-season-card">
+            <div class="db-card-header">
+              <div class="db-card-title">Sazonalidade</div>
+              <div class="db-chip-row">
+                <span class="db-chip active">30d</span>
+              </div>
+            </div>
+            <div class="db-season-wrap" id="seasonalityChart"></div>
+          </div>
+
+          <!-- Cripto balance -->
+          <div class="db-card db-crypto-card">
+            <div class="db-card-header">
+              <div class="db-card-title">Saldo Cripto</div>
+              <a href="#" id="zfinanceCardLink" class="db-zfinance-link">Z-Finance →</a>
+            </div>
+            <div id="dbCryptoBalances"></div>
+            <div class="db-crypto-cta">
+              <div class="db-card-title" style="margin-top:14px">Conversão Automática</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+                <select id="settlementCurrency" class="db-select">
+                  <option value="BRL">BRL</option>
+                  <option value="USDT">USDT</option>
+                  <option value="BTC">BTC</option>
+                  <option value="ETH">ETH</option>
+                </select>
+                <label class="switch" style="flex-shrink:0"><input type="checkbox" id="autoConvert"/><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden elements needed by existing JS -->
+        <div hidden>
+          <div id="riskScore"></div>
+          <div id="riskDetail"></div>
+          <div id="approvalDetail"></div>
+          <div id="avgDetail"></div>
+          <div id="volumeTrendHidden" id="volumeTrend2"></div>
+          <div id="revenueTrend2"></div>
+          <div id="feesTrend2"></div>
+          <div id="balanceTrend2"></div>
+        </div>
+
+        <!-- Insights avançados (conversão/performance) -->
+        <div class="db-card" id="advancedPanel">
+          <div class="db-card-header">
+            <div class="db-card-title">Insights Avançados</div>
+            <div class="db-chip-row" id="insightsChips">
+              <span class="chip active" data-tab="risco">Risco</span>
+              <span class="chip" data-tab="conversao">Conversão</span>
+              <span class="chip" data-tab="performance">Performance</span>
+            </div>
+          </div>
+          <div id="insightsRisco" class="insights-tab" style="display:none"></div>
+          <div id="insightsConversao" class="insights-tab" hidden>
+            <div class="conversion-panel">
+              <div>
+                <div class="card-title">Conversão automática de recebíveis</div>
+                <p>Simule a conversão do volume para a moeda desejada.</p>
+              </div>
+              <div class="conversion-controls">
+                <label class="switch"><input type="checkbox" id="autoConvert2"/><span class="slider"></span></label>
+                <span class="label-row">Auto converter</span>
+              </div>
+        </div>
+          <div class="conversion-panel" style="margin-top:12px;">
+            <div class="card-title">Receber saldo em cripto</div>
+            <p>Cobranças em cripto são convertidas para BRL por padrão.</p>
+            <a href="#" class="link" data-goto="settings">Configurar carteira →</a>
+          </div>
+        </div>
+        <div id="insightsPerformance" class="insights-tab" hidden>
+          <div class="advanced-grid">
+            <div class="advanced-card">
+              <div class="card-title">Latência média</div>
+              <div class="card-value" id="latencyAvg">~180ms</div>
+              <div class="card-sub">Tempo de resposta API</div>
+            </div>
+            <div class="advanced-card">
+              <div class="card-title">Uptime 30d</div>
+              <div class="card-value" id="uptimePct">99.98%</div>
+              <div class="card-sub">Disponibilidade</div>
+            </div>
+            <div class="advanced-card">
+              <div class="card-title">Transações/hora</div>
+              <div class="card-value" id="txPerHour">—</div>
+              <div class="card-sub">Pico nas últimas 24h</div>
+            </div>
+          </div>
+        </div>
+        </div><!-- end advancedPanel -->
+      </div><!-- end premiumDashboard -->
+
+      <!-- Legacy hidden sections for setView compatibility -->
+      <section id="dashboardView"  hidden style="display:none!important"></section>
+      <section id="seasonalityPanel" hidden style="display:none!important"></section>
+      <section id="summaryCards"   hidden style="display:none!important"></section>
+      <section id="tutorialPanel"  hidden style="display:none!important"></section>
+
+      <section class="panel" id="chargesView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="charges">Cobranças</h2>
+          <button class="ghost" id="refreshCharges" data-i18n="refresh">Atualizar</button>
+        </div>
+        <div class="table-wrapper">
+          <div class="table table-charges" id="chargesTable"></div>
+          <div class="pagination" id="chargesPagination"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="paymentsView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="payments">Pagamentos</h2>
+          <button class="ghost" id="refreshPayments" data-i18n="refresh">Atualizar</button>
+        </div>
+        <div class="method-chart-panel">
+          <h3 data-i18n="method_dist">Distribuição por método de pagamento</h3>
+          <div class="method-chart" id="methodChart"></div>
+        </div>
+        <div class="table-wrapper">
+          <div class="table table-payments" id="paymentsTable"></div>
+          <div class="pagination" id="paymentsPagination"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="payoutsView" hidden>
+        <div class="panel-header">
+          <h2>Payouts</h2>
+          <button class="ghost" id="openPayout" data-i18n="request_payout">Solicitar payout</button>
+        </div>
+        <div class="table" id="payoutsTable"></div>
+      </section>
+
+      <section class="panel" id="webhooksView" hidden>
+        <div class="panel-header">
+          <h2>Webhooks</h2>
+          <button class="ghost" id="refreshWebhooks" data-i18n="refresh">Atualizar</button>
+        </div>
+        <div class="table" id="webhooksTable"></div>
+        <div class="panel-header" style="margin-top:16px;">
+          <h2 data-i18n="webhook_sim">Simulador de webhook</h2>
+          <button class="ghost" id="triggerWebhook" data-i18n="trigger_now">Disparar agora</button>
+        </div>
+        <div class="webhook-sim">
+          <div class="webhook-console" id="webhookConsole"></div>
+          <div class="webhook-status" id="webhookStatus" data-i18n="waiting_event">Aguardando evento...</div>
+        </div>
+      </section>
+
+      <section class="panel" id="onboardingView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="onboarding_title">Onboarding do merchant</h2>
+          <span class="badge" id="onboardingStatus" data-i18n="kyc_queue">KYC em fila</span>
+        </div>
+        <div class="onboarding-grid">
+          <div class="onboarding-step">
+            <div class="step-title" data-i18n="step_basic">1. Cadastro básico</div>
+            <p data-i18n="step_basic_desc">Dados da empresa e responsável.</p>
+            <button class="ghost" data-i18n="complete">Completo</button>
+          </div>
+          <div class="onboarding-step">
+            <div class="step-title" data-i18n="step_docs">2. Documentos</div>
+            <p data-i18n="step_docs_desc">Contrato social, comprovante bancário.</p>
+            <button class="ghost" id="uploadDocs" data-i18n="send_docs">Enviar docs</button>
+          </div>
+          <div class="onboarding-step">
+            <div class="step-title" data-i18n="step_kyc">3. KYC em fila</div>
+            <p data-i18n="step_kyc_desc">Equipe compliance analisando.</p>
+            <div class="progress"><span></span></div>
+          </div>
+          <div class="onboarding-step">
+            <div class="step-title" data-i18n="step_activation">4. Ativação</div>
+            <p data-i18n="step_activation_desc">Conta pronta para receber pagamentos.</p>
+            <button class="ghost" id="simulateKyc" data-i18n="simulate_approval">Simular aprovação</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="analyticsView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="analytics_title">Relatórios & Analytics</h2>
+        </div>
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div class="analytics-icon">📊</div>
+            <h3 data-i18n="export_report">Exportar relatório</h3>
+            <p data-i18n="export_desc">Baixe transações em CSV ou PDF para contabilidade e auditoria.</p>
+            <button class="ghost" id="exportCsv" data-i18n="export_csv">Exportar CSV</button>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-icon">📈</div>
+            <h3 data-i18n="revenue_forecast">Previsão de receita</h3>
+            <p data-i18n="forecast_desc">Projeção baseada em tendências dos últimos 90 dias.</p>
+            <span class="analytics-value" id="revenueForecast">—</span>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-icon">🛡️</div>
+            <h3 data-i18n="fraud_alerts">Alertas de fraude</h3>
+            <p data-i18n="fraud_desc">Monitoramento em tempo real de transações suspeitas.</p>
+            <span class="badge badge-ok" id="fraudStatus" data-i18n="active">Ativo</span>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-icon">🔄</div>
+            <h3 data-i18n="chargebacks">Chargebacks</h3>
+            <p data-i18n="chargebacks_desc">Central de disputas e contestação de chargebacks.</p>
+            <button class="ghost" id="viewChargebacks" data-i18n="view_disputes">Ver disputas</button>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-icon">💰</div>
+            <h3 data-i18n="advance_title">Antecipação de recebíveis</h3>
+            <p data-i18n="advance_desc">Antecipe vendas a cartão com taxa fixa de 1,5% a.m. Sem spread oculto.</p>
+            <div class="advance-form">
+              <input type="number" id="advanceAmount" data-i18n-placeholder="amount_placeholder" placeholder="Valor (R$)" min="100" />
+              <button class="primary" id="requestAdvance" data-i18n="request">Solicitar</button>
+            </div>
+            <span class="advance-preview" id="advancePreview">—</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="plansView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="plans_title">Planos Z-PAY</h2>
+          <span class="badge" id="currentPlanBadge">Plano atual: PRO</span>
+        </div>
+        <div class="plans-grid">
+          <div class="plan-card">
+            <h3 data-i18n="plan_starter">Starter</h3>
+            <div class="plan-price">1,99%</div>
+            <p data-i18n="per_tx">por transação</p>
+            <ul>
+              <li data-i18n="plan_starter_li1">Até 1.000 transações/mês</li>
+              <li data-i18n="plan_starter_li2">PIX, Cartão, Boleto</li>
+              <li data-i18n="plan_starter_li3">Suporte por e-mail</li>
+            </ul>
+            <button class="ghost" disabled data-i18n="current_plan_btn">Plano atual</button>
+          </div>
+          <div class="plan-card plan-featured">
+            <span class="plan-badge" data-i18n="recommended">Recomendado</span>
+            <h3 data-i18n="plan_pro">Pro</h3>
+            <div class="plan-price">1,49%</div>
+            <p data-i18n="per_tx">por transação</p>
+            <ul>
+              <li data-i18n="plan_pro_li1">Até 50.000 transações/mês</li>
+              <li data-i18n="plan_pro_li2">PIX, Cartão, Boleto, Cripto</li>
+              <li data-i18n="plan_pro_li3">Webhooks avançados</li>
+              <li data-i18n="plan_pro_li4">Suporte prioritário</li>
+            </ul>
+            <button class="primary" data-i18n="current_plan_btn">Plano atual</button>
+          </div>
+          <div class="plan-card">
+            <h3 data-i18n="plan_enterprise">Enterprise</h3>
+            <div class="plan-price" data-i18n="plan_price_contact">Sob consulta</div>
+            <p data-i18n="custom_volume">volume customizado</p>
+            <ul>
+              <li data-i18n="plan_ent_li1">Transações ilimitadas</li>
+              <li data-i18n="plan_ent_li2">White-label</li>
+              <li data-i18n="plan_ent_li3">API dedicada</li>
+              <li data-i18n="plan_ent_li4">Gerente de conta</li>
+            </ul>
+            <button class="ghost" data-i18n="contact_sales">Contatar vendas</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="linkbioView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="linkbio_title">Meu Link (Link-in-bio)</h2>
+          <button class="primary" id="addLinkProduct" data-i18n="add_product">+ Adicionar produto</button>
+        </div>
+        <p class="panel-desc" data-i18n="linkbio_desc">Crie seu link único com catálogo de produtos. Ideal para influenciadores e freelancers.</p>
+        <div class="linkbio-preview">
+          <div class="linkbio-url">
+            <span data-i18n="your_link">Seu link:</span>
+            <code id="linkbioUrl">—</code>
+            <button class="ghost" id="copyLinkbio" data-i18n="copy">Copiar</button>
+          </div>
+        </div>
+        <div class="linkbio-products" id="linkbioProducts"></div>
+      </section>
+
+      <section class="panel" id="subscriptionsView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="subscriptions_title">Assinaturas (Recorrência PIX)</h2>
+          <button class="primary" id="openSubscriptionModal" data-i18n="new_subscription">+ Nova assinatura</button>
+        </div>
+        <p class="panel-desc" data-i18n="subscriptions_desc">Cobranças recorrentes mensais via PIX. Alternativa ao cartão recorrente.</p>
+        <div class="table-wrapper">
+          <div class="table" id="subscriptionsTable"></div>
+          <div class="pagination" id="subscriptionsPagination"></div>
+        </div>
+      </section>
+
+      <section class="panel docs-panel" id="docsView" hidden>
+        <div class="panel-header docs-header">
+          <h2 data-i18n="docs_title">Documentação da API</h2>
+          <div class="docs-lang-row">
+            <span class="docs-lang-label" data-i18n="docs_lang">Idioma</span>
+            <div class="docs-lang-btns">
+              <button class="docs-lang-btn active" data-lang="pt" title="Português">🇧🇷</button>
+              <button class="docs-lang-btn" data-lang="en" title="English">🇺🇸</button>
+              <button class="docs-lang-btn" data-lang="zh" title="中文">🇨🇳</button>
+            </div>
+          </div>
+        </div>
+        <div class="docs-content">
+          <div class="docs-chip"><span></span> REST API</div>
+          <h3 class="docs-section-title" data-i18n="docs_auth">Autenticação</h3>
+          <div class="docs-terminal">
+            <div class="docs-terminal-bar">
+              <span class="docs-dot docs-dot-r"></span>
+              <span class="docs-dot docs-dot-y"></span>
+              <span class="docs-dot docs-dot-g"></span>
+              <span class="docs-terminal-title" data-i18n="docs_auth">Autenticação</span>
+            </div>
+            <pre class="docs-code"><code>Authorization: Bearer <span class="c-str" data-i18n="docs_token">{seu_token}</span></code></pre>
+          </div>
+          <h3 class="docs-section-title" data-i18n="docs_endpoints">Endpoints principais</h3>
+          <div class="docs-endpoints">
+            <div class="docs-endpoint"><span class="docs-method post">POST</span><code>/charges</code><span class="docs-desc" data-i18n="docs_ep1">Criar cobrança</span></div>
+            <div class="docs-endpoint"><span class="docs-method get">GET</span><code>/charges</code><span class="docs-desc" data-i18n="docs_ep2">Listar cobranças</span></div>
+            <div class="docs-endpoint"><span class="docs-method post">POST</span><code>/charges/:id/pay</code><span class="docs-desc" data-i18n="docs_ep3">Simular pagamento</span></div>
+            <div class="docs-endpoint"><span class="docs-method get">GET</span><code>/payments</code><span class="docs-desc" data-i18n="docs_ep4">Listar pagamentos</span></div>
+            <div class="docs-endpoint"><span class="docs-method get">GET</span><code>/dashboard/summary</code><span class="docs-desc" data-i18n="docs_ep5">Resumo do dashboard</span></div>
+          </div>
+          <h3 class="docs-section-title" data-i18n="docs_example">Exemplo (Node.js)</h3>
+          <div class="docs-terminal docs-terminal-large">
+            <div class="docs-terminal-bar">
+              <span class="docs-dot docs-dot-r"></span>
+              <span class="docs-dot docs-dot-y"></span>
+              <span class="docs-dot docs-dot-g"></span>
+              <span class="docs-terminal-title">POST /charges · Node.js</span>
+            </div>
+            <pre class="docs-code"><code><span class="c-dim">// <span data-i18n="docs_comment">Crie uma cobrança e receba um link em segundos</span></span>
+<span class="c-kw">const</span> res = <span class="c-kw">await</span> <span class="c-fn">fetch</span>(<span class="c-str">'https://api.zpay.com/charges'</span>, {
+  <span class="c-key">method</span>: <span class="c-str">'POST'</span>,
+  <span class="c-key">headers</span>: {
+    <span class="c-str">'Content-Type'</span>: <span class="c-str">'application/json'</span>,
+    <span class="c-str">'Authorization'</span>: <span class="c-str">'Bearer '</span> + token
+  },
+  <span class="c-key">body</span>: <span class="c-fn">JSON.stringify</span>({ <span class="c-key">amount</span>: <span class="c-num">10000</span>, <span class="c-key">currency</span>: <span class="c-str">'BRL'</span> })
+});</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="roadmapView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="roadmap_title">Roadmap Z-PAY</h2>
+          <p class="roadmap-subtitle" data-i18n="roadmap_subtitle">Features para se destacar da concorrência</p>
+        </div>
+        <div class="roadmap-tabs">
+          <button class="roadmap-tab active" data-roadmap="alta" data-i18n="high_priority">Alta prioridade</button>
+          <button class="roadmap-tab" data-roadmap="media" data-i18n="medium_priority">Média prioridade</button>
+          <button class="roadmap-tab" data-roadmap="longo" data-i18n="long_term">Longo prazo</button>
+        </div>
+        <div class="roadmap-content" id="roadmapAlta">
+          <div class="roadmap-grid">
+            <div class="roadmap-card">
+              <span class="roadmap-priority" data-i18n="priority_high">Alta</span>
+              <h3 data-i18n="roadmap_integration_title">Integração Z-PAY + Z-Finance</h3>
+              <p data-i18n="roadmap_integration_desc">Conta Z-Finance como carteira para receber pagamentos. Saldo disponível para investimentos, empréstimos ou transferências. Ecossistema fechado.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority" data-i18n="priority_high">Alta</span>
+              <h3 data-i18n="roadmap_linkbio_title">Link-in-bio / Checkout 1 clique</h3>
+              <p data-i18n="roadmap_linkbio_desc">Link único por merchant (pay.zetta.com/loja) com catálogo de produtos. Ideal para influenciadores e freelancers.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority" data-i18n="priority_high">Alta</span>
+              <h3 data-i18n="roadmap_recurrence_title">Recorrência via PIX</h3>
+              <p data-i18n="roadmap_recurrence_desc">Assinaturas com cobrança automática mensal via PIX. Alternativa ao cartão recorrente.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority" data-i18n="priority_high">Alta</span>
+              <h3 data-i18n="roadmap_advance_title">Antecipação com taxa fixa</h3>
+              <p data-i18n="roadmap_advance_desc">Antecipe vendas a cartão com taxa única (ex: 1,5% a.m.). Sem spread oculto.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority" data-i18n="priority_high">Alta</span>
+              <h3 data-i18n="roadmap_pdf_title">Relatórios PDF</h3>
+              <p data-i18n="roadmap_pdf_desc">Exportar PDF com branding Z-PAY. Relatórios agendados por e-mail.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority" data-i18n="priority_high">Alta</span>
+              <h3 data-i18n="roadmap_realtime_title">Dashboard tempo real</h3>
+              <p data-i18n="roadmap_realtime_desc">WebSocket para atualização live. Notificações push quando pagamento aprovado.</p>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-content" id="roadmapMedia" hidden>
+          <div class="roadmap-grid">
+            <div class="roadmap-card">
+              <span class="roadmap-priority media" data-i18n="priority_medium">Média</span>
+              <h3 data-i18n="roadmap_split_title">Split em tempo real</h3>
+              <p data-i18n="roadmap_split_desc">Divisão automática entre vendedor, afiliado e plataforma. Regras por produto.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority media">Média</span>
+              <h3>PIX parcelado</h3>
+              <p>Parcelamento via PIX com taxas transparentes. PIX crédito.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority media">Média</span>
+              <h3>White-label</h3>
+              <p>Checkout com logo, cores e domínio do cliente. E-mails personalizados.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority media">Média</span>
+              <h3>API-first + SDKs</h3>
+              <p>SDKs Node, Python, PHP, React. Documentação Swagger. Sandbox gratuito.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority media">Média</span>
+              <h3>Anti-fraude avançado</h3>
+              <p>Score por transação. Regras customizáveis. Blacklist. Relatório de suspeitas.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority media">Média</span>
+              <h3>Gestão de chargebacks</h3>
+              <p>Lista de disputas. Upload de documentos. Timeline. Alertas de prazo.</p>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-content" id="roadmapLongo" hidden>
+          <div class="roadmap-grid">
+            <div class="roadmap-card">
+              <span class="roadmap-priority longo">Longo</span>
+              <h3>Open Banking</h3>
+              <p>Conexão com contas bancárias. Pagamentos via débito em conta (DDA).</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority longo">Longo</span>
+              <h3>BNPL (Buy Now Pay Later)</h3>
+              <p>Parcelamento 3x sem juros para o comprador. Custo no merchant ou compartilhado.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority longo">Longo</span>
+              <h3>Marketplace nativo</h3>
+              <p>Múltiplos vendedores em uma loja. Split automático. Relatórios por vendedor.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority longo">Longo</span>
+              <h3>Multi-currency</h3>
+              <p>Dashboard de câmbio. Conversão automática. Carteira multi-moeda.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority longo">Longo</span>
+              <h3>Integrações</h3>
+              <p>Zapier, Make. Webhooks avançados. Retry configurável.</p>
+            </div>
+            <div class="roadmap-card">
+              <span class="roadmap-priority longo">Longo</span>
+              <h3>Suporte</h3>
+              <p>Chat in-app. Base de conhecimento. Status page (uptime).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="settingsView" hidden>
+        <div class="panel-header">
+          <h2 data-i18n="settings_title">Configurações</h2>
+        </div>
+        <form class="form" id="settingsForm">
+          <label>
+            <span class="label-row" data-i18n="api_base">API Base</span>
+            <input id="apiBase" type="url" placeholder="https://pay.zetta.com/api" />
+          </label>
+          <label>
+            <span class="label-row" data-i18n="zfinance_url">URL Z-Finance</span>
+            <input id="zfinanceUrl" type="url" placeholder="http://95.111.247.134:8081" />
+          </label>
+          <label>
+            <span class="label-row" data-i18n="webhook_url">Webhook URL</span>
+            <input id="webhookUrl" type="url" placeholder="https://merchant.app/webhooks" />
+          </label>
+          <div class="settings-divider">
+            <h4 data-i18n="crypto_wallet_opt">Carteira cripto (opcional)</h4>
+            <p data-i18n="crypto_wallet_desc">Para receber saldo em cripto em vez de BRL. Cobranças em cripto são convertidas automaticamente para BRL, exceto se você configurar aqui.</p>
+          </div>
+          <label>
+            <span class="label-row" data-i18n="receive_crypto">Receber saldo em cripto</span>
+            <label class="switch"><input type="checkbox" id="receiveCrypto" /><span class="slider"></span></label>
+          </label>
+          <label id="walletFields" hidden>
+            <span class="label-row" data-i18n="wallet_address">Endereço da carteira</span>
+            <input id="cryptoWalletAddress" type="text" placeholder="0x... ou bc1..." />
+          </label>
+          <label id="walletCurrencyLabel" hidden>
+            <span class="label-row" data-i18n="receive_currency">Moeda de recebimento</span>
+            <select id="cryptoWalletCurrency">
+              <option value="USDT">USDT</option>
+              <option value="BTC">BTC</option>
+              <option value="ETH">ETH</option>
+            </select>
+          </label>
+          <div class="settings-divider">
+            <h4 data-i18n="whitelabel">White-label (aparência)</h4>
+            <p data-i18n="whitelabel_desc">Personalize o checkout com sua marca.</p>
+          </div>
+          <label>
+            <span class="label-row" data-i18n="logo_url">URL da logo</span>
+            <input id="whitelabelLogo" type="url" placeholder="https://sua-loja.com/logo.png" />
+          </label>
+          <label>
+            <span class="label-row" data-i18n="primary_color">Cor primária</span>
+            <input id="whitelabelColor" type="text" placeholder="#22c55e" value="#22c55e" />
+          </label>
+          <label>
+            <span class="label-row" data-i18n="custom_domain">Domínio customizado</span>
+            <input id="whitelabelDomain" type="text" placeholder="pay.sualoja.com" />
+          </label>
+          <button class="primary" type="submit" data-i18n="save">Salvar</button>
+        </form>
+      </section>
+
+      <!-- CHECKOUT ADAPTATIVO -->
+      <section class="panel" id="checkout-adaptativoView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <div>
+            <h2>Checkout Inteligente Adaptativo</h2>
+            <p style="font-size:13px;color:var(--text3);margin-top:4px">O checkout detecta o perfil do pagador e se adapta em tempo real para maximizar conversão</p>
+          </div>
+          <span class="adaptive-badge">IA ATIVA</span>
+        </div>
+        <div id="adaptiveContent"></div>
+      </section>
+
+      <!-- PAGAMENTO PREDITIVO -->
+      <section class="panel" id="pagamento-preditivoView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Pagamento Preditivo</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">ZION identifica o melhor momento para disparar cobranças recorrentes</p>
+        </div>
+        <div id="predictiveContent"></div>
+      </section>
+
+      <!-- SISTEMA NERVOSO -->
+      <section class="panel" id="sistema-nervosoView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Sistema Nervoso</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">ZION monitora seu negócio 24/7 e age proativamente sem você pedir</p>
+        </div>
+        <div id="nerveContent"></div>
+      </section>
+
+      <!-- NOTA FISCAL AUTOMÁTICA -->
+      <section class="panel" id="nota-fiscalView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Nota Fiscal Automática</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">NF emitida automaticamente a cada pagamento aprovado com otimização tributária</p>
+        </div>
+        <div id="nfContent"></div>
+      </section>
+
+      <!-- AGENTIC COMMERCE -->
+      <section class="panel" id="agenticView" hidden>
+        <div class="panel-header" style="margin-bottom:20px">
+          <h2>Agentic Commerce</h2>
+          <p style="font-size:13px;color:var(--text3);margin-top:4px">Seus produtos disponíveis para compra dentro de IAs como ChatGPT e Gemini</p>
+        </div>
+        <div id="agenticContent"></div>
+      </section>
+
+      <section class="panel" id="contadorView" hidden>
+        <div class="panel-header">
+          <h2>Painel do Contador</h2>
+          <span class="badge badge-ok">Parceiro ativo</span>
+        </div>
+        <div id="contadorContent"></div>
+      </section>
+
+      <!-- CHARGEBACKS -->
+      <section class="panel" id="chargebacksView" hidden>
+        <div class="panel-header">
+          <h2>Gestão de Chargebacks</h2>
+        </div>
+        <div id="chargebacksContent"></div>
+      </section>
+
+    </main>
+  </div>
+  </div><!-- .app-wrap -->
+
+  <div class="modal" id="chargeModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 data-i18n="new_charge_modal">Nova cobrança</h2>
+        <button class="ghost close-modal" data-close="chargeModal" aria-label="Fechar">×</button>
+      </div>
+      <form id="chargeForm" class="form">
+        <label>
+          <span class="label-row" data-i18n="charge_currency">Moeda da cobrança</span>
+          <select id="chargeCurrency">
+            <optgroup label="Fiat">
+              <option value="BRL">BRL</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </optgroup>
+            <optgroup label="Cripto">
+              <option value="USDT">USDT</option>
+              <option value="BTC">BTC</option>
+              <option value="ETH">ETH</option>
+            </optgroup>
+          </select>
+        </label>
+        <label>
+          <span class="label-row" data-i18n="value">Valor</span>
+          <input id="chargeAmount" type="number" min="0.01" step="0.01" required placeholder="Ex: 100 ou 0.001" />
+        </label>
+        <label>
+          <span class="label-row" data-i18n="description">Descrição</span>
+          <input id="chargeDescription" type="text" />
+        </label>
+        <label>
+          <span class="label-row" data-i18n="customer_id">ID do cliente</span>
+          <input id="chargeCustomerId" type="text" placeholder="cli_abc123 ou e-mail" />
+        </label>
+        <div class="split-panel">
+          <span class="label-row" data-i18n="split_payment">Split de pagamento</span>
+          <div class="split-row">
+            <input type="text" data-i18n-placeholder="seller" placeholder="Vendedor" id="splitReceiver1" />
+            <input type="number" min="0" max="100" placeholder="%" id="splitPct1" value="100" />
+          </div>
+          <div class="split-row">
+            <input type="text" data-i18n-placeholder="affiliate" placeholder="Afiliado (opcional)" id="splitReceiver2" />
+            <input type="number" min="0" max="100" placeholder="%" id="splitPct2" value="0" />
+          </div>
+          <div class="split-row">
+            <input type="text" data-i18n-placeholder="platform" placeholder="Plataforma (opcional)" id="splitReceiver3" />
+            <input type="number" min="0" max="100" placeholder="%" id="splitPct3" value="0" />
+          </div>
+          <span class="split-total" id="splitTotal">Total: 100%</span>
+        </div>
+        <button class="primary" type="submit" data-i18n="create">Criar</button>
+      </form>
+      <div class="success" id="chargeResult" hidden></div>
+    </div>
+  </div>
+
+  <div class="modal" id="payoutModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 data-i18n="new_payout">Novo payout</h2>
+        <button class="ghost close-modal" data-close="payoutModal" aria-label="Fechar">×</button>
+      </div>
+      <form id="payoutForm" class="form">
+        <label>
+          <span class="label-row" data-i18n="payout_value_brl">Valor (BRL)</span>
+          <input id="payoutAmount" type="number" min="1" required />
+        </label>
+        <label>
+          <span class="label-row" data-i18n="method">Método</span>
+          <select id="payoutMethod">
+            <option value="PIX">PIX</option>
+            <option value="TED">TED</option>
+          </select>
+        </label>
+        <button class="primary" type="submit" data-i18n="request">Solicitar</button>
+      </form>
+      <div class="error" id="payoutError" hidden></div>
+    </div>
+  </div>
+
+  <div class="modal" id="checkoutModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 data-i18n="quick_checkout">Checkout rápido</h2>
+        <button class="ghost close-modal" data-close="checkoutModal" aria-label="Fechar">×</button>
+      </div>
+      <p data-i18n="checkout_desc">Simule um pagamento para uma cobrança existente.</p>
+      <form id="checkoutForm" class="form">
+        <label>
+          <span class="label-row" data-i18n="charge_id">Charge ID</span>
+          <input id="checkoutChargeId" type="text" required />
+        </label>
+        <label>
+          <span class="label-row" data-i18n="method">Método</span>
+          <select id="checkoutMethod">
+            <option value="PIX">PIX</option>
+            <option value="CARD">Cartão</option>
+            <option value="BOLETO">Boleto</option>
+            <option value="CRYPTO">Cripto</option>
+          </select>
+        </label>
+        <button class="primary" type="submit" data-i18n="pay">Pagar</button>
+      </form>
+      <div class="success" id="checkoutResult" hidden></div>
+    </div>
+  </div>
+
+  <div class="modal" id="linkProductModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 data-i18n="add_product_modal">Adicionar produto</h2>
+        <button class="ghost close-modal" data-close="linkProductModal">×</button>
+      </div>
+      <form id="linkProductForm" class="form">
+        <label><span data-i18n="product_name">Nome do produto</span><input id="productName" required /></label>
+        <label><span data-i18n="value">Valor (R$)</span><input id="productAmount" type="number" min="0.01" step="0.01" required /></label>
+        <label><span data-i18n="description">Descrição</span><input id="productDesc" data-i18n-placeholder="optional" placeholder="Opcional" /></label>
+        <button class="primary" type="submit" data-i18n="add">Adicionar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="subscriptionModal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 data-i18n="new_subscription_modal">Nova assinatura</h2>
+        <button class="ghost close-modal" data-close="subscriptionModal">×</button>
+      </div>
+      <form id="subscriptionForm" class="form">
+        <label><span data-i18n="monthly_value">Valor mensal (R$)</span><input id="subAmount" type="number" min="1" required /></label>
+        <label><span data-i18n="description">Descrição</span><input id="subDesc" placeholder="Ex: Plano Premium" /></label>
+        <label><span data-i18n="due_day">Dia do vencimento</span><input id="subDay" type="number" min="1" max="28" value="10" /></label>
+        <button class="primary" type="submit" data-i18n="create_subscription">Criar assinatura</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden></div>
+
+
+  <!-- ZION WIDGET -->
+  <div id="zionWidget" style="display:none">
+    <button class="zion-fab" id="zionFab">
+      <div class="zion-img-wrap">
+        <img src="zion_zpay.png" class="zion-img" alt="ZION"/>
+      </div>
+      <span class="zion-fab-label" style="display:none">ZION</span>
+    </button>
+    <div class="zion-chat" id="zionChat" hidden>
+      <div class="zion-chat-header">
+        <img src="zion_zpay.png" class="ztc-avatar-sm" alt="ZION"/>
+        <div>
+          <div class="zion-chat-name">ZION</div>
+          <div class="zion-chat-status" id="zionStatus">● Analisando seus dados</div>
+        </div>
+        <button class="zion-close" id="zionClose">✕</button>
+      </div>
+      <div class="zion-messages" id="zionMessages"></div>
+      <div class="zion-input-row">
+        <input class="zion-input" id="zionInput" placeholder="Pergunte ao ZION..."/>
+        <button class="zion-send" id="zionSend">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOUR OVERLAY -->
+  <div class="zion-tour-overlay" id="tourOverlay" style="display:none"></div>
+  <div class="zion-tour-highlight" id="tourHighlight" style="display:none"></div>
+  <div class="zion-tour-card" id="tourCard" style="display:none">
+    <div class="ztc-header">
+      <img src="zion_zpay.png" class="ztc-avatar-sm" alt="ZION"/>
+      <div>
+        <div class="ztc-name">ZION</div>
+        <div class="ztc-step" id="tourStepLabel">1 de 12</div>
+      </div>
+      <button class="ztc-close" id="tourClose">✕</button>
+    </div>
+    <div class="ztc-progress"><div class="ztc-progress-bar" id="tourProgress"></div></div>
+    <div class="ztc-title" id="tourTitle"></div>
+    <div class="ztc-desc" id="tourDesc"></div>
+    <div class="ztc-actions">
+      <button class="ztc-prev" id="tourPrev">← Anterior</button>
+      <button class="ztc-next" id="tourNext">Próximo →</button>
+    </div>
+  </div>
+
+`;
