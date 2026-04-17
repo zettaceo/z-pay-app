@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <title>Z-PAY — Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#060912;--card:#0d1322;--card2:#101828;--border:rgba(255,255,255,0.055);--text:#f3f4f6;--text2:#a7b0c2;--text3:#59627a;--ember:#ff7a18;--ember2:#ff4d00;--mint:#34d399}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .checkout{width:100%;max-width:420px}
+    .modal-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .checkout-logo{margin-bottom:16px}
+    .checkout-logo img{max-height:52px;display:block}
+    h2{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:900;margin-bottom:8px;color:var(--text)}
+    p{font-size:14px;color:var(--text2);margin-bottom:4px}
+    .card-value{font-family:'Bricolage Grotesque',sans-serif;font-size:32px;font-weight:900;color:var(--ember);margin:16px 0}
+    .pix-parcelado{margin:16px 0}
+    .pix-parcelado label{font-size:13px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px}
+    .pix-parcelado select{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;max-width:120px}
+    #parcelaValor{margin-left:12px;font-size:13px;color:var(--mint);font-weight:600}
+    input,select{font-size:16px !important}button{width:100%;margin-top:8px;padding:13px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s}
+    .primary{background:linear-gradient(135deg,var(--ember),var(--ember2));color:#000;box-shadow:0 8px 24px rgba(255,122,24,.2)}
+    .primary:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(255,122,24,.3)}
+    .ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+    .ghost:hover{border-color:rgba(255,122,24,.3);color:var(--ember)}
+    .success{margin-top:16px;font-size:13px;color:var(--mint);text-align:center;font-weight:600}
+    .footer{margin-top:24px;text-align:center;font-size:11px;color:var(--text3)}
+    .footer a{color:var(--ember);text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="checkout" id="checkoutRoot">
+    <div class="modal-card">
+      <div id="checkoutLogo" class="checkout-logo" hidden></div>
+      <h2 id="checkoutTitle">Checkout Z-PAY</h2>
+      <p id="checkoutDesc">Carregando...</p>
+      <div class="card-value" id="checkoutAmount">R$ 0,00</div>
+      <div class="pix-parcelado" id="pixParcelado" hidden>
+        <label>PIX parcelado:</label>
+        <select id="parcelas">
+          <option value="1">À vista</option>
+          <option value="3">3x</option>
+          <option value="6">6x</option>
+          <option value="12">12x</option>
+        </select>
+        <span id="parcelaValor"></span>
+      </div>
+      <button class="primary" id="payPix">⚡ Pagar via PIX</button>
+      <button class="ghost" id="payCard">💳 Pagar via Cartão</button>
+      <button class="ghost" id="payBoleto">📄 Pagar via Boleto</button>
+      <button class="ghost" id="payCrypto">₿ Pagar via Cripto</button>
+      <div class="success" id="checkoutStatus"></div>
+    </div>
+    <div class="footer">Powered by <a href="/">Z-PAY</a> · Pagamento seguro com criptografia AES-256</div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const chargeId = params.get('charge');
+    const amountParam = params.get('amount');
+    const descParam = params.get('desc');
+    const apiBase = (localStorage.getItem('zpay_api_base') || 'https://api.pay.zetta.com');
+    const wl = JSON.parse(localStorage.getItem('zpay_whitelabel') || '{}');
+    if (wl.logo) { const logo = document.getElementById('checkoutLogo'); if (logo) { logo.innerHTML = '<img src="' + wl.logo + '" alt="Logo" />'; logo.hidden = false; } }
+    if (wl.color) { document.documentElement.style.setProperty('--ember', wl.color); }
+    const formatMoney = (v) => (Number(v||0)/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const status = document.getElementById('checkoutStatus');
+    let currentAmount = 0;
+    const loadCharge = async () => {
+      if (chargeId) {
+        try { const res = await fetch(apiBase+'/public/charges/'+chargeId); const data = await res.json(); currentAmount = data.amount||0; document.getElementById('checkoutDesc').textContent = data.description||'Pagamento'; document.getElementById('checkoutAmount').textContent = formatMoney(currentAmount); }
+        catch(e) { document.getElementById('checkoutDesc').textContent = 'Demo: Cobrança simulada'; document.getElementById('checkoutAmount').textContent = 'R$ 250,00'; currentAmount = 25000; }
+      } else if (amountParam) {
+        currentAmount = Number(amountParam); document.getElementById('checkoutDesc').textContent = descParam ? decodeURIComponent(descParam) : 'Pagamento'; document.getElementById('checkoutAmount').textContent = formatMoney(currentAmount);
+        document.getElementById('pixParcelado').hidden = false; document.getElementById('parcelas').onchange = updateParcela; updateParcela();
+      } else {
+        document.getElementById('checkoutDesc').textContent = 'Demo: Exemplo de checkout Z-PAY';
+        document.getElementById('checkoutAmount').textContent = 'R$ 250,00'; currentAmount = 25000;
+      }
+    };
+    const updateParcela = () => { const n = Number(document.getElementById('parcelas').value); const v = currentAmount/100; const p = n>1?(v*1.02/n):v; document.getElementById('parcelaValor').textContent = n>1?n+'x de '+formatMoney(p*100):''; };
+    const pay = async (method) => {
+      status.textContent = '🔒 Processando pagamento seguro...';
+      await new Promise(r=>setTimeout(r,1500));
+      status.textContent = '✅ Pagamento ' + method + ' confirmado! Obrigado.';
+      document.querySelectorAll('button').forEach(b=>b.disabled=true);
+    };
+    document.getElementById('payPix').onclick = () => pay('PIX');
+    document.getElementById('payCard').onclick = () => pay('CARD');
+    document.getElementById('payBoleto').onclick = () => pay('BOLETO');
+    document.getElementById('payCrypto').onclick = () => pay('CRYPTO');
+    loadCharge();
+  </script>
+</body>
+</html>

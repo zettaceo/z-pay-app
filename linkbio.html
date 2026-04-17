@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <title>Z-PAY — Meu Link</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body{background:radial-gradient(1200px 700px at 10% 10%, rgba(46,232,255,.06), transparent 55%),radial-gradient(900px 600px at 90% 15%, rgba(255,122,24,.08), transparent 55%),#07070c;}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5;}
+    .linkbio-page{min-height:100vh;color:#f3f4f6;padding:40px 24px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+    .linkbio-header{text-align:center;margin-bottom:40px;}
+    .linkbio-header .logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,rgba(255,122,24,.15),rgba(46,232,255,.08));border:1px solid rgba(255,122,24,.25);color:#ff7a18;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0 auto 20px;box-shadow:0 0 24px rgba(255,122,24,.15);}
+    .linkbio-header h1{font-family:'Bricolage Grotesque',sans-serif;font-size:32px;font-weight:900;letter-spacing:-.02em;}
+    .linkbio-header p{font-size:15px;color:#a7b0c2;margin-top:8px;}
+    .linkbio-products{width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px;}
+    .linkbio-item{background:rgba(15,16,26,.7);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px 22px;cursor:pointer;transition:all .25s;}
+    .linkbio-item:hover{border-color:rgba(255,122,24,.3);box-shadow:0 12px 40px rgba(255,122,24,.12),0 0 0 1px rgba(255,122,24,.08);transform:translateY(-2px);}
+    .linkbio-item h3{font-family:'Bricolage Grotesque',sans-serif;margin:0 0 8px;font-size:18px;font-weight:900;}
+    .linkbio-item p{margin:0;color:#a7b0c2;font-size:14px;line-height:1.5;}
+    .linkbio-item .price{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:900;color:#ff7a18;margin-top:14px;}
+  </style>
+</head>
+<body>
+  <div class="linkbio-page">
+    <div class="linkbio-header">
+      <div class="logo">ZP</div>
+      <h1>Meus produtos</h1>
+      <p>Clique para pagar</p>
+    </div>
+    <div class="linkbio-products" id="products"></div>
+  </div>
+  <script>
+    (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug') || 'demo';
+    const apiBase = localStorage.getItem('zpay_api_base') || 'https://api.pay.zetta.com';
+    const baseUrl = apiBase.replace(/\/api\/?$/, '');
+    const LINKBIO_KEY = 'zpay_linkbio_products';
+    let products = JSON.parse(localStorage.getItem(LINKBIO_KEY) || '[]');
+    if (products.length === 0) {
+      try {
+        const r = await fetch(`${apiBase}/public/link/${slug}`);
+        if (r.ok) {
+          const d = await r.json();
+          products = d.products || [];
+        }
+      } catch (_) {}
+    }
+    if (products.length === 0) {
+      products = [{ id: '1', name: 'Produto demo', amount: 50, desc: 'Clique para ver o checkout' }];
+    }
+    const formatMoney = (v) => (Number(v || 0) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const container = document.getElementById('products');
+    if (products.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:#94a3b8;">Nenhum produto cadastrado. Faça login no Z-PAY e adicione produtos em "Meu Link".</p>';
+    } else {
+      container.innerHTML = products.map((p) => `
+        <div class="linkbio-item" data-amount="${p.amount}" data-name="${p.name}" data-desc="${p.desc || ''}">
+          <h3>${p.name}</h3>
+          ${p.desc ? `<p>${p.desc}</p>` : ''}
+          <div class="price">${formatMoney(p.amount * 100)}</div>
+        </div>
+      `).join('');
+      container.querySelectorAll('.linkbio-item').forEach((el) => {
+        el.addEventListener('click', async () => {
+          const amount = Number(el.dataset.amount) * 100;
+          const desc = el.dataset.name;
+          const token = localStorage.getItem('zpay_token');
+          if (token) {
+            try {
+              const res = await fetch(`${apiBase}/charges`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ amount, description: desc, currency: 'BRL' })
+              });
+              const data = await res.json();
+              if (data.id) window.location.href = `${baseUrl}/checkout.html?charge=${data.id}`;
+              else window.location.href = `${baseUrl}/checkout.html?amount=${amount}&desc=${encodeURIComponent(desc)}`;
+            } catch (_) {
+              window.location.href = `${baseUrl}/checkout.html?amount=${amount}&desc=${encodeURIComponent(desc)}`;
+            }
+          } else {
+            window.location.href = `${baseUrl}/checkout.html?amount=${amount}&desc=${encodeURIComponent(desc)}`;
+          }
+        });
+      });
+    }
+    })();
+  </script>
+</body>
+</html>
